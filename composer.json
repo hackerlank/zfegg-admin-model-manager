@@ -1,0 +1,23 @@
+{
+    "name": "zfegg/zfegg-admin-model-manager",
+    "keywords": ["model manager","zendframework2", "zf2"],
+    "description": "Zend Framework 2 Model Manager Module. 模型管理模块",
+    "require": {
+        "php": ">=5.5",
+        "zendframework/zendframework": "2.4.*"
+    },
+    "require-dev": {
+        "fabpot/php-cs-fixer": "~1.0"
+    },
+    "authors": [
+        {
+            "name": "moln",
+            "email": "xiemaomao520@163.com"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "Zfegg\\ModelManager\\":"src"
+        }
+    }
+}

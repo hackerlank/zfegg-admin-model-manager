@@ -1,0 +1,108 @@
+<div id="model-manager-model-<?=$id?>"></div>
+
+<script>
+    $(function () {
+        var config = <?=json_encode($config)?>;
+        var fieldsConfig = {}, columnsConfig = [], gridSettings = {};
+
+        config.column_alias && $.each(config.column_alias, function (name, alias) {
+            var column = alias || name;
+            fieldsConfig[column] = {type: config.ui_type[column]};
+        });
+
+        $.each(config.ui_title, function (column, title) {
+            var title = title || column,
+                columnConfig = {field: column, title: title};
+            if (config.ui_hidden[column]) {
+                columnConfig.hidden = config.ui_hidden[column];
+            }
+            if (config.ui_template[column]) {
+                columnConfig.template = config.ui_template[column];
+            }
+            if (config.ui_width[column]) {
+                columnConfig.width = config.ui_width[column];
+            }
+            columnConfig.sortable = Boolean(config.ui_sortable && config.ui_sortable[column]);
+            columnConfig.filterable = Boolean(config.ui_filterable && config.ui_filterable[column]);
+
+            columnsConfig.push(columnConfig);
+        });
+
+        if (config.detail_enable) {
+            gridSettings.detailTemplate = config.detail_template;
+        }
+
+        var $grid = $('#model-manager-model-<?=$id?>'),
+            serviceUrl = "./model-manager/source/",
+            dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: serviceUrl + "read/id/<?=$id?>",
+                    update: serviceUrl + "save/id/<?=$id?>",
+                    destroy: serviceUrl + "delete/id/<?=$id?>",
+                    create: serviceUrl + "save/id/<?=$id?>"
+                },
+                schema: {
+                    id: 'id',
+                    model: {
+                        fields: fieldsConfig
+                    },
+                    "data": "data",
+                    "total": "total"
+                },
+                error: function (e) {
+                    if (e.status == "customerror") {
+                        for (var i in e.errors) {
+                            for (var j in e.errors[i]) {
+                                alert(e.errors[i][j]);
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                },
+                pageSize: 15,
+                serverFiltering: true,
+                serverPaging: true,
+                serverSorting: true
+            });
+
+
+        $grid.kendoGrid($.extend({
+            dataSource: dataSource,
+            pageable: true,
+            filterable: {
+                extra: false,
+                messages: {
+                    info: "查找: ",
+                    filter: "提交",
+                    clear: "清除",
+                    selectValue: "------选择------",
+                    and: "并且",
+                    or: "或者"
+                },
+                operators: {
+                    string: {
+                        eq: "等于",
+                        contains: "模糊查找"
+                    },
+                    number: {
+                        eq: "等于"
+                    },
+                    date: {
+                        ge: "大于等于",
+                        le: "小于",
+                        gt: "大于",
+                        lt: "小于"
+                    },
+                    enums: {
+                        eq: "满足条件"
+                    }
+                }
+            },
+            columns: columnsConfig,
+            selectable: true,
+//            editable: "popup",
+            sortable: true
+        }, gridSettings));
+    });
+</script>
