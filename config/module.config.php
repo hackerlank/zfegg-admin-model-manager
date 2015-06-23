@@ -3,7 +3,7 @@
 return array(
     'router'       => array(
         'routes' => array(
-            'model-manager'    => array(
+            'zfegg-model-manager'    => array(
                 'type'    => 'segment',
                 'options' => array(
                     'route'       => '/model-manager[/:controller[/:action]]',
@@ -23,7 +23,7 @@ return array(
                     ),
                 ),
             ),
-            'model-manager-ui' => array(
+            'zfegg-model-manager-ui' => array(
                 'type'    => 'segment',
                 'options' => array(
                     'route'       => '/ui/model-manager[/:ctrl[/:name]]',
@@ -44,13 +44,13 @@ return array(
         'guards' => [
             'Zfegg\Admin\Rbac\PermissionsGuard' => [
                 'routes' => [
-                    'model-manager*'
+                    'zfegg-model-manager*'
                 ],
             ]
         ]
     ],
 
-    'moln_admin'   => array(
+    'zfegg_admin'   => array(
         'menus'                          => array(
             'model_manager' => array(
                 'text'     => '模型管理',
