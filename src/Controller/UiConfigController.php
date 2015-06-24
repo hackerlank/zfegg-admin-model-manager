@@ -14,7 +14,7 @@ class UiConfigController extends AbstractActionController
     {
 
         /** @var \Zend\Db\TableGateway\TableGateway $table */
-        $table = $this->get('ModelManager\DataSourceConfigTable');
+        $table = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
 
         $result = $table->select(
             function (Select $select) {
@@ -49,7 +49,7 @@ class UiConfigController extends AbstractActionController
     {
         /** @var \Zfegg\ModelManager\DataSource\DataSourceManager $dataSourceManager */
         $dataSourceManager     = $this->get('Zfegg\ModelManager\DataSourceManager');
-        $dataSourceConfigTable = $this->get('ModelManager\DataSourceConfigTable');
+        $dataSourceConfigTable = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
         $dataSourceConfig      = $dataSourceConfigTable->select(['name' => $this->params('name')])->current();
 
         $error = null;

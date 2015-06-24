@@ -43,7 +43,7 @@ class DataSourceConfigController extends AbstractActionController
         }
 
 
-        $table  = $this->get('ModelManager\DataSourceConfigTable');
+        $table  = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
         $config = array(
             'name'    => $data['name'],
             'adapter' => $data['adapter'],

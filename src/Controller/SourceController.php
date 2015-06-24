@@ -29,7 +29,7 @@ class SourceController extends AbstractActionController
 
         $config                = $this->getUiConfigTable()->loadConfig($id);
         $dataSourceManager     = $this->get('Zfegg\ModelManager\DataSourceManager');
-        $dataSourceConfigTable = $this->get('ModelManager\DataSourceConfigTable');
+        $dataSourceConfigTable = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
         $dataSourceConfig      = $dataSourceConfigTable->select(['name' => $config['source']])->current();
 
         try {
