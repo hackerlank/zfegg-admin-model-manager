@@ -134,7 +134,7 @@
             $typeRestful = $('div[data-type=restful]');
 
         $.get(
-            '<?=$this->url('model-manager/params', ['controller' => 'ui-config', 'action' => 'init'])?>',
+            '<?=$this->url('zfegg-model-manager/params', ['controller' => 'ui-config', 'action' => 'init'])?>',
             function (r) {
 
                 for (var i = 0; i < r.data_source.length; i++) {
@@ -157,7 +157,7 @@
                         $typeRestful.appendTo($queryRuleContext);
 
                         $.get(
-                            '<?=$this->url('model-manager/params', ['controller' => 'ui-config', 'action' => 'get-tables'])?>/name/' + $selectSource.val(),
+                            '<?=$this->url('zfegg-model-manager/params', ['controller' => 'ui-config', 'action' => 'get-tables'])?>/name/' + $selectSource.val(),
                             function (r) {
                                 if (r.error) {
                                     alert(r.error);
@@ -178,7 +178,7 @@
                         $typeRestful.detach();
                         $typeDb.appendTo($queryRuleContext);
                         $.get(
-                            '<?=$this->url('model-manager/params', ['controller' => 'ui-config', 'action' => 'get-tables'])?>/name/' + $selectSource.val(),
+                            '<?=$this->url('zfegg-model-manager/params', ['controller' => 'ui-config', 'action' => 'get-tables'])?>/name/' + $selectSource.val(),
                             function (r) {
                                 if (r.error) {
                                     alert(r.error);

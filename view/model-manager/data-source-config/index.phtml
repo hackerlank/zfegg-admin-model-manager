@@ -76,7 +76,7 @@ $adapters = array(
             e.preventDefault();
 
             $.post(
-                '<?=$this->url('model-manager/params', ['controller' => 'data-source-config', 'action' => 'add'])?>',
+                '<?=$this->url('zfegg-model-manager/params', ['controller' => 'data-source-config', 'action' => 'add'])?>',
                 $(this).serialize(),
                 function () {
                     alert('添加成功');

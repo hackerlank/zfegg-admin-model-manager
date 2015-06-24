@@ -94,7 +94,7 @@ class UiConfigController extends AbstractActionController
         }
         unset($data['source_adapter']);
 
-        $table = $this->get('ModelManager\UiConfigTable');
+        $table = $this->getUiConfigTable();
         $table->insert($data);
 
         return new JsonModel(['code' => 1]);
@@ -105,7 +105,7 @@ class UiConfigController extends AbstractActionController
      */
     public function getUiConfigTable()
     {
-        return $this->get('ModelManager\UiConfigTable');
+        return $this->get('Zfegg\ModelManager\UiConfigTable');
     }
 
 }

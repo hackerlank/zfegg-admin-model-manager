@@ -56,6 +56,6 @@ class SourceController extends AbstractActionController
      */
     public function getUiConfigTable()
     {
-        return $this->get('ModelManager\UiConfigTable');
+        return $this->get('Zfegg\ModelManager\UiConfigTable');
     }
 }

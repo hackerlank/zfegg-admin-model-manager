@@ -52,7 +52,7 @@ return array(
 
     'zfegg_admin'   => array(
         'menus'                          => array(
-            'model_manager' => array(
+            'Zfegg\ModelManager' => array(
                 'text'     => '模型管理',
                 'expanded' => true,
                 'items'    => array(
@@ -60,35 +60,24 @@ return array(
                         'text'  => '数据表模型',
                         'index' => 0,
                         'url'   => './ui/model-manager/data-source-config/index',
-//                        'permission' => 'admin.user.index',
                     ),
                     array(
                         'text'  => '模型UI配置',
                         'index' => 1,
                         'url'   => './ui/model-manager/ui-config/index',
-//                        'permission' => 'admin.role.index',
                     ),
                     array(
                         'text'  => '模型UI列表',
                         'index' => 1,
                         'url'   => './ui/model-manager/ui-config/list',
-//                        'permission' => 'admin.role.index',
                     ),
-//                    array(
-//                        'text'  => '权限管理',
-//                        'index' => 2,
-//                        'url'   => './ui/model-manager/permission/index',
-////                        'permission' => 'admin.permission.index',
-//                    ),
                     array(
                         'text'  => '查询测试4',
                         'url'   => './model-manager/source/view/id/4',
-//                        'permission' => 'admin.permission.index',
                     ),
                     array(
                         'text'  => '查询测试2',
                         'url'   => './model-manager/source/view/id/2',
-//                        'permission' => 'admin.permission.index',
                     ),
                 ),
             ),
@@ -109,28 +98,17 @@ return array(
         ),
     ),
 
-    'db'           => array(
-        'adapters' => array(
-            'Zfegg\ModelManager'       => array(
-                'driver'         => 'Pdo',
-                'dsn'            => 'mysql:dbname=platform-admin;host=localhost;charset=utf8;',
-                'username'       => 'root',
-                'password'       => '',
-            ),
-        )
-    ),
-
     'tables'       => array(
-        'ModelManager\DataSourceConfigTable' => array(
+        'Zfegg\ModelManager\DataSourceConfigTable' => array(
             'table'   => 'model_manager_data_source_config',
             'primary' => 'id',
-            'adapter' => 'Zfegg\ModelManager',
+            'adapter' => 'Zfegg\Admin\DbAdapter',
         ),
-        'ModelManager\UiConfigTable' => array(
+        'Zfegg\ModelManager\UiConfigTable' => array(
             'table'   => 'model_manager_ui_config',
             'invokable' => 'Zfegg\ModelManager\Model\UiConfigTable',
             'primary' => 'id',
-            'adapter' => 'Zfegg\ModelManager',
+            'adapter' => 'Zfegg\Admin\DbAdapter',
         ),
     ),
 
