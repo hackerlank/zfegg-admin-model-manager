@@ -2,12 +2,13 @@
 
 namespace Zfegg\ModelManager\DataSource;
 use Gzfextra\Stdlib\OptionsTrait;
+use Zend\Json\Server\Client;
 
 class JsonRpc implements DataSourceInterface
 {
     use OptionsTrait;
 
-    protected $url, $fields = [];
+    protected $url, $fields = [], $rpcClient;
 
     public function __construct($options)
     {
@@ -29,6 +30,7 @@ class JsonRpc implements DataSourceInterface
      */
     public function read()
     {
+        $this->getRpcClient()->call('select', []);
     }
 
     public function setDataConfig(array $config)
@@ -69,5 +71,14 @@ class JsonRpc implements DataSourceInterface
     {
         $this->fields = $fields;
         return $this;
+    }
+
+    private function getRpcClient()
+    {
+        if (!$this->rpcClient) {
+            $this->rpcClient = new Client($this->getUrl());
+        }
+
+        return $this->rpcClient;
     }
 }

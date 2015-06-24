@@ -57,7 +57,12 @@ return array(
                 'expanded' => true,
                 'items'    => array(
                     array(
-                        'text'  => '数据表模型',
+                        'text'  => '数据源添加',
+                        'index' => 0,
+                        'url'   => './ui/model-manager/data-source-config/index',
+                    ),
+                    array(
+                        'text'  => '数据源添加',
                         'index' => 0,
                         'url'   => './ui/model-manager/data-source-config/index',
                     ),

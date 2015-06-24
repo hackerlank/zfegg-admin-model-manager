@@ -2,6 +2,7 @@
 
 namespace Zfegg\ModelManager\Controller;
 
+use Zend\Db\Sql\Select;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\BaseConfigInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\RestfulInputFilter;
@@ -10,6 +11,19 @@ use Zend\View\Model\JsonModel;
 
 class DataSourceConfigController extends AbstractActionController
 {
+    public function readAction()
+    {
+        $table = $this->getDataSourceConfigTable();
+
+        /** @var \Zend\Paginator\Paginator $paginator */
+        $paginator = $table->fetchPaginator();
+        $paginator->setCurrentPageNumber($this->getRequest()->getPost('page', 1));
+
+        return [
+            'total' => $paginator->getTotalItemCount(),
+            'data'  => $paginator->getCurrentItems()->toArray(),
+        ];
+    }
 
     public function addAction()
     {
@@ -43,7 +57,7 @@ class DataSourceConfigController extends AbstractActionController
         }
 
 
-        $table  = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
+        $table  = $this->getDataSourceConfigTable();
         $config = array(
             'name'    => $data['name'],
             'adapter' => $data['adapter'],
@@ -54,5 +68,13 @@ class DataSourceConfigController extends AbstractActionController
         $table->insert($config);
 
         return new JsonModel(['code' => 1]);
+    }
+
+    /**
+     * @return \Zfegg\ModelManager\Model\DataSourceConfigTable
+     */
+    public function getDataSourceConfigTable()
+    {
+        return $this->get('Zfegg\ModelManager\DataSourceConfigTable');
     }
 }
