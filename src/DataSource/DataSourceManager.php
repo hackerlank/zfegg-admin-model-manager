@@ -15,6 +15,7 @@ class DataSourceManager extends AbstractPluginManager
         'pgsql'   => 'Zfegg\ModelManager\DataSource\Pgsql',
         'sqlsrv'  => 'Zfegg\ModelManager\DataSource\Sqlsrv',
         'restful' => 'Zfegg\ModelManager\DataSource\Restful',
+        'jsonrpc' => 'Zfegg\ModelManager\DataSource\JsonRpc',
     ];
 
     /**

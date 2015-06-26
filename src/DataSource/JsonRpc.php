@@ -3,6 +3,8 @@
 namespace Zfegg\ModelManager\DataSource;
 use Gzfextra\Stdlib\OptionsTrait;
 use Zend\Json\Server\Client;
+use Zend\Paginator\Adapter\Callback;
+use Zend\Paginator\Paginator;
 
 class JsonRpc implements DataSourceInterface
 {
@@ -30,7 +32,36 @@ class JsonRpc implements DataSourceInterface
      */
     public function read()
     {
-        $this->getRpcClient()->call('select', []);
+        $results = [];
+        $getResults = function ($offset = null, $itemCountPerPage = null) use (&$results) {
+            if (empty($results)) {
+                $callResults = $this->getRpcClient()->call('select', []);
+
+                if (!(isset($callResults['meta']) || isset($callResults['data']) || isset($callResults['total']))) {
+                    throw new \RuntimeException('RPC接口返回数据不符合接口规范');
+                }
+
+                $columns = array_keys($callResults['meta']);
+                foreach ($callResults['data'] as $i => $row) {
+                    $callResults['data'][$i] = array_combine($columns, $row);
+                }
+
+                $results['data'] = $callResults['data'];
+                $results['total'] = $callResults['total'];
+            }
+
+            return $results;
+        };
+
+        $adapter = new Callback(
+            function ($offset, $itemCountPerPage) use ($getResults) {
+                return $getResults($offset, $itemCountPerPage)['data'];
+            }, function () use ($getResults) {
+            return $getResults()['total'];
+        }
+        );
+
+        return new Paginator($adapter);
     }
 
     public function setDataConfig(array $config)
