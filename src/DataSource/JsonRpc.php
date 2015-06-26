@@ -1,6 +1,7 @@
 <?php
 
 namespace Zfegg\ModelManager\DataSource;
+
 use Gzfextra\Stdlib\OptionsTrait;
 use Zend\Json\Server\Client;
 use Zend\Paginator\Adapter\Callback;
@@ -28,37 +29,31 @@ class JsonRpc implements DataSourceInterface
     }
 
     /**
-     * @return \Zend\Paginator\Paginator
+     * @param array|\Zend\Db\Sql\Where $where
+     * @param array $sort
+     * @return Paginator
      */
-    public function read()
+    public function read($where = [], $sort = [])
     {
-        $results = [];
-        $getResults = function ($offset = null, $itemCountPerPage = null) use (&$results) {
-            if (empty($results)) {
-                $callResults = $this->getRpcClient()->call('select', []);
+        $adapter = new Callback(
+            function ($offset, $itemCountPerPage) use ($where, $sort) {
+                $results = $this->getRpcClient()->call('select', [$where, $sort, $offset, $itemCountPerPage]);
 
-                if (!(isset($callResults['meta']) || isset($callResults['data']) || isset($callResults['total']))) {
+                if (!(isset($results['meta']) && isset($results['rows']))) {
                     throw new \RuntimeException('RPC接口返回数据不符合接口规范');
                 }
 
-                $columns = array_keys($callResults['meta']);
-                foreach ($callResults['data'] as $i => $row) {
-                    $callResults['data'][$i] = array_combine($columns, $row);
+                $columns = array_keys($results['meta']);
+                foreach ($results['rows'] as $i => $row) {
+                    $results['rows'][$i] = array_combine($columns, $row);
                 }
 
-                $results['data'] = $callResults['data'];
-                $results['total'] = $callResults['total'];
+                return $results['rows'];
+            },
+
+            function () use ($where) {
+                return (int)$this->getRpcClient()->call('fetchCount', [$where]);
             }
-
-            return $results;
-        };
-
-        $adapter = new Callback(
-            function ($offset, $itemCountPerPage) use ($getResults) {
-                return $getResults($offset, $itemCountPerPage)['data'];
-            }, function () use ($getResults) {
-            return $getResults()['total'];
-        }
         );
 
         return new Paginator($adapter);
