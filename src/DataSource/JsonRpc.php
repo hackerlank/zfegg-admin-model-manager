@@ -33,7 +33,7 @@ class JsonRpc implements DataSourceInterface
      * @param array $sort
      * @return Paginator
      */
-    public function read($where = [], $sort = [])
+    public function fetchPaginator($where = [], $sort = [])
     {
         $adapter = new Callback(
             function ($offset, $itemCountPerPage) use ($where, $sort) {
@@ -57,6 +57,22 @@ class JsonRpc implements DataSourceInterface
         );
 
         return new Paginator($adapter);
+    }
+
+    public function select($where = [], $sort = [], $offset = 0, $itemCountPerPage = 0)
+    {
+        $results = $this->getRpcClient()->call('select', [$where, $sort, $offset, $itemCountPerPage]);
+
+        if (!(isset($results['meta']) && isset($results['rows']))) {
+            throw new \RuntimeException('RPC接口返回数据不符合接口规范');
+        }
+
+        $columns = array_keys($results['meta']);
+        foreach ($results['rows'] as $i => $row) {
+            $results['rows'][$i] = array_combine($columns, $row);
+        }
+
+        return $results['rows'];
     }
 
     public function setDataConfig(array $config)
@@ -106,5 +122,35 @@ class JsonRpc implements DataSourceInterface
         }
 
         return $this->rpcClient;
+    }
+
+    public function call($method, array $row)
+    {
+        $result = (array)$this->getRpcClient()->call($method, [$row]);
+
+        if (!isset($result['code'])) {
+            $result += ['code' => 1, 'msg' => '操作失败,接口无响应结果'];
+        } else if ($result['code'] == 0) {
+            $result += ['msg' => '操作成功'];
+        } else {
+            $result += ['msg' => '操作失败'];
+        }
+
+        return $result;
+    }
+
+    public function update(array $row)
+    {
+        $result = $this->call('update', $row);
+        if (!isset($result['row'])) {
+            throw new \RuntimeException('更新接口错误, 没有返回 row');
+        }
+
+        return $result;
+    }
+
+    public function exportExcel($where = [], $sort = [])
+    {
+
     }
 }

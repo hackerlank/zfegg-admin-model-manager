@@ -92,9 +92,10 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
 
     /**
      * @param Where|array $where
+     * @param array $sort
      * @return Paginator
      */
-    public function read($where = null)
+    public function fetchPaginator($where = [], $sort = [])
     {
         $config = $this->dataConfig;
         if ($config['query_type'] == 'normal') {
@@ -133,5 +134,15 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
     public function setDataConfig(array $config)
     {
         $this->dataConfig = $config;
+    }
+
+    public function call($method, array $row)
+    {
+        ;
+    }
+
+    public function update(array $row)
+    {
+        ;
     }
 }

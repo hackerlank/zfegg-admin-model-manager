@@ -1,71 +1,42 @@
-<div id="model-manager-model-<?=$id?>"></div>
+<div id="model-manager-model-<?=$id?>" ></div>
 
 <script>
     $(function () {
         var config = <?=json_encode($config)?>;
-        var fieldsConfig = {}, columnsConfig = [], gridSettings = {};
+        var gridSettings = {};
 
-        config.column_alias && $.each(config.column_alias, function (name, alias) {
-            var column = alias || name;
-            fieldsConfig[column] = {type: config.ui_type[column]};
-        });
-
-        $.each(config.ui_title, function (column, title) {
-            var title = title || column,
-                columnConfig = {field: column, title: title};
-            if (config.ui_hidden[column]) {
-                columnConfig.hidden = config.ui_hidden[column];
-            }
-            if (config.ui_template[column]) {
-                columnConfig.template = config.ui_template[column];
-            }
-            if (config.ui_width[column]) {
-                columnConfig.width = config.ui_width[column];
-            }
-            columnConfig.sortable = Boolean(config.ui_sortable && config.ui_sortable[column]);
-            columnConfig.filterable = Boolean(config.ui_filterable && config.ui_filterable[column]);
-
-            columnsConfig.push(columnConfig);
-        });
-
-        if (config.detail_enable) {
-            gridSettings.detailTemplate = config.detail_template;
+        if (config.columns) {
+            gridSettings.columns = config.columns;
+        }
+        if (config.detailEnable) {
+            gridSettings.detailTemplate = config.detailTemplate;
+        }
+        if (config.toolbar) {
+            gridSettings.toolbar= config.toolbar;
         }
 
         var $grid = $('#model-manager-model-<?=$id?>'),
-            serviceUrl = "./model-manager/source/",
+            serviceUrl = '<?=$this->url(null, ['controller' => $id])?>',
             dataSource = new kendo.data.DataSource({
                 transport: {
-                    read: serviceUrl + "read/id/<?=$id?>",
-                    update: serviceUrl + "save/id/<?=$id?>",
-                    destroy: serviceUrl + "delete/id/<?=$id?>",
-                    create: serviceUrl + "save/id/<?=$id?>"
+                    read: '<?=$this->url(null, ['controller' => $id, 'action' => 'read'])?>',
+                    update: '<?=$this->url(null, ['controller' => $id, 'action' => 'update'])?>',
+                    destroy: '<?=$this->url(null, ['controller' => $id, 'action' => 'delete'])?>',
+                    create: '<?=$this->url(null, ['controller' => $id, 'action' => 'create'])?>'
                 },
                 schema: {
-                    id: 'id',
                     model: {
-                        fields: fieldsConfig
+                        id: config.primary,
+                        fields: config.fields
                     },
                     "data": "data",
                     "total": "total"
-                },
-                error: function (e) {
-                    if (e.status == "customerror") {
-                        for (var i in e.errors) {
-                            for (var j in e.errors[i]) {
-                                alert(e.errors[i][j]);
-                                break;
-                            }
-                            break;
-                        }
-                    }
                 },
                 pageSize: 15,
                 serverFiltering: true,
                 serverPaging: true,
                 serverSorting: true
             });
-
 
         $grid.kendoGrid($.extend({
             dataSource: dataSource,
@@ -83,6 +54,7 @@
                 operators: {
                     string: {
                         eq: "等于",
+                        startswith:"右模糊查找",
                         contains: "模糊查找"
                     },
                     number: {
@@ -99,10 +71,56 @@
                     }
                 }
             },
-            columns: columnsConfig,
+            columns: [],
             selectable: true,
-//            editable: "popup",
-            sortable: true
+            editable: "popup",
+            sortable: true,
+            change: function () {
+                $toolbar.find('a.k-button').removeAttr('disabled');
+            },
+            edit: function (e) {
+                console.log(e, this);
+            },
+            save: function(e) {
+                console.log(e, this);
+            }
         }, gridSettings));
+
+        var kGrid = $grid.data('kendoGrid'),
+            $toolbar = $grid.find('.k-grid-toolbar');
+
+        $toolbar.on('click', 'a', function () {
+
+            var action = $(this).data('action');
+
+            if (action == 'edit') {
+                kGrid.select().each(function () {
+                    kGrid.editRow(this);
+                });
+            } else if (action == 'excel') {
+                window.location = '<?=$this->url(null, ['controller' => $id, 'action' => 'export-excel'])?>?'
+                + $.param({
+                    filter: kGrid.dataSource.filter(),
+                    sort: kGrid.dataSource.filter()
+                });
+            } else {
+                kGrid.select().each(function () {
+                    $.post(
+                        '<?=$this->url(null, ['controller' => $id, 'action' => 'execute'])?>',
+                        {
+                            method: action,
+                            row: kGrid.dataItem(this).toJSON()
+                        },
+                        function (r) {
+                            if (r.code === 0) {
+                                alert(r.msg);
+                            } else {
+                                alert(r.msg);
+                            }
+                        }
+                    );
+                });
+            }
+        });
     });
 </script>

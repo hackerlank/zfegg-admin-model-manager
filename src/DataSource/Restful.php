@@ -30,7 +30,7 @@ class Restful implements DataSourceInterface
     /**
      * @return \Zend\Paginator\Paginator
      */
-    public function read()
+    public function fetchPaginator()
     {
         $results = [];
         $getResults = function ($offset = null, $itemCountPerPage = null) use (&$results) {

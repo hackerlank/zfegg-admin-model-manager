@@ -40,7 +40,7 @@ class SourceController extends AbstractActionController
             );
 
             $dataSource->setDataConfig((array)$config['source_config']);
-            $paginator = $dataSource->read($this->ui()->filter());
+            $paginator = $dataSource->fetchPaginator($this->ui()->filter());
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
         }
