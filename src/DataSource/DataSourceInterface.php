@@ -34,8 +34,11 @@ interface DataSourceInterface {
 
     /**
      * 更新
-     * @param array $row
+     *
+*@param array $data
      * @return mixed
      */
-    public function update(array $row);
+    public function update(array $data);
+
+    public function insert(array $data);
 }

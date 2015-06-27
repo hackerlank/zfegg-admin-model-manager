@@ -139,18 +139,23 @@ class JsonRpc implements DataSourceInterface
         return $result;
     }
 
-    public function update(array $row)
+    public function update(array $data)
     {
-        $result = $this->call('update', $row);
-        if (!isset($result['row'])) {
-            throw new \RuntimeException('更新接口错误, 没有返回 row');
+        $result = $this->call('update', [$data]);
+        if ($result['code'] === 0 &&!isset($result['row'])) {
+            throw new \RuntimeException('Update 接口错误, 没有返回 row');
         }
 
         return $result;
     }
 
-    public function exportExcel($where = [], $sort = [])
+    public function insert(array $data)
     {
+        $result = $this->call('insert', [$data]);
+        if ($result['code'] === 0 && !isset($result['row'])) {
+            throw new \RuntimeException('Insert 接口错误, 没有返回 row');
+        }
 
+        return $result;
     }
 }

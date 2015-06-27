@@ -141,8 +141,13 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
         ;
     }
 
-    public function update(array $row)
+    public function update(array $data)
     {
         ;
+    }
+
+    public function insert(array $data)
+    {
+        
     }
 }
