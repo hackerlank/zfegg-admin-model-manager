@@ -148,6 +148,6 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
 
     public function insert(array $data)
     {
-        
+
     }
 }

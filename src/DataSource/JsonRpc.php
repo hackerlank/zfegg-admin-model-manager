@@ -158,4 +158,9 @@ class JsonRpc implements DataSourceInterface
 
         return $result;
     }
+
+    public function delete(array $data)
+    {
+        return $this->call('delete', $data);
+    }
 }

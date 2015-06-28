@@ -41,4 +41,6 @@ interface DataSourceInterface {
     public function update(array $data);
 
     public function insert(array $data);
+
+    public function delete(array $data);
 }

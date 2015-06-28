@@ -2,7 +2,12 @@
 
 <script>
     $(function () {
-        var config = <?=json_encode($config)?>;
+        var editors = {
+            editor: function (container, options) {
+                $('<textarea>').appendTo(container).kendoEditor({ resizable: true });
+            }
+        };
+        var config = <?=Zend\Json\Json::encode($config, false, array('enableJsonExprFinder' => true));?>;
         var gridSettings = {};
 
         if (config.columns) {
@@ -22,7 +27,7 @@
                     read: '<?=$this->url(null, ['controller' => $id, 'action' => 'read'])?>',
                     update: '<?=$this->url(null, ['controller' => $id, 'action' => 'update'])?>',
                     destroy: '<?=$this->url(null, ['controller' => $id, 'action' => 'delete'])?>',
-                    create: '<?=$this->url(null, ['controller' => $id, 'action' => 'create'])?>'
+                    create: '<?=$this->url(null, ['controller' => $id, 'action' => 'insert'])?>'
                 },
                 schema: {
                     model: {
@@ -32,7 +37,7 @@
                     "data": "data",
                     "total": "total"
                 },
-                pageSize: 15,
+                pageSize: 20,
                 serverFiltering: true,
                 serverPaging: true,
                 serverSorting: true
@@ -40,7 +45,6 @@
 
         $grid.kendoGrid($.extend({
             dataSource: dataSource,
-            pageable: true,
             filterable: {
                 extra: false,
                 messages: {
@@ -73,16 +77,18 @@
             },
             columns: [],
             selectable: true,
-            editable: "popup",
+            editable: {
+                mode: "popup",
+                window: {
+                    width: 600
+                }
+            },
             sortable: true,
             change: function () {
                 $toolbar.find('a.k-button').removeAttr('disabled');
             },
-            edit: function (e) {
-                console.log(e, this);
-            },
-            save: function(e) {
-                console.log(e, this);
+            pageable: {
+                pageSizes: [20, 50, 100]
             }
         }, gridSettings));
 
@@ -97,6 +103,12 @@
                 kGrid.select().each(function () {
                     kGrid.editRow(this);
                 });
+            } else if (action == 'destroy') {
+                kGrid.select().each(function () {
+                    kGrid.removeRow(this);
+                });
+            } else if (action == 'create') {
+                return ;
             } else if (action == 'excel') {
                 window.location = '<?=$this->url(null, ['controller' => $id, 'action' => 'export-excel'])?>?'
                 + $.param({
