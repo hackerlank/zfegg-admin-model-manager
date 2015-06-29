@@ -57,14 +57,9 @@ return array(
                 'expanded' => true,
                 'items'    => array(
                     array(
-                        'text'  => '数据源添加',
+                        'text'  => '数据源管理',
                         'index' => 0,
-                        'url'   => './ui/model-manager/data-source-config/index',
-                    ),
-                    array(
-                        'text'  => '数据源添加',
-                        'index' => 0,
-                        'url'   => './ui/model-manager/data-source-config/index',
+                        'url'   => './model-manager/data-source-config/index',
                     ),
                     array(
                         'text'  => '模型UI配置',
@@ -77,11 +72,11 @@ return array(
                         'url'   => './ui/model-manager/ui-config/list',
                     ),
                     array(
-                        'text'  => '查询测试4',
+                        'text'  => '菜单配置',
                         'url'   => './model-manager/source/view/id/4',
                     ),
                     array(
-                        'text'  => '查询测试2',
+                        'text'  => '数据源权限',
                         'url'   => './model-manager/source/view/id/2',
                     ),
                 ),

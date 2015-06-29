@@ -2,15 +2,70 @@
 
 namespace Zfegg\ModelManager\Controller;
 
-use Zend\Db\Sql\Select;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\BaseConfigInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\RestfulInputFilter;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
 
 class DataSourceConfigController extends AbstractActionController
 {
+
+    public function indexAction()
+    {
+        $adapters = [
+            'Mysql',
+            'Oracle',
+            'IbmDB2',
+            'Sqlite',
+            'Pgsql',
+            'Sqlsrv',
+            'JsonRpc',
+        ];
+
+        return new ViewModel([
+            'adapters' => $adapters,
+            'id'     => $this->params('__CONTROLLER__'),
+            'config' => [
+                'primary' => 'id',
+                'fields'  => [
+                    'id'    => ['type' => 'number', 'editable' => false, 'nullable' => true],
+                    'name'  => ['type' => 'string'],
+                    'adapter_options'  => ['type' => 'string'],
+                ],
+                'columns' => [
+                    [
+                        "field"      => "id",
+                        "title"      => "ID",
+                        "sortable"   => true,
+                        "filterable" => true,
+                        "width" => 100,
+                    ],
+                    [
+                        "field"      => "name",
+                        "title"      => "名称",
+                        "filterable" => true,
+                        "width" => 250,
+                    ],
+                    [
+                        "field"      => "adapter",
+                        "title"      => "适配器",
+                        "values"     => $adapters,
+                        "filterable" => true,
+                    ],
+                ],
+                'toolbar' => [
+                    ['name' => 'edit', 'text' => '编辑', 'attr' => 'data-action=edit disabled'],
+                    ['name' => 'create', 'text' => '增加', 'attr' => 'data-action=create'],
+                    ['name' => 'destroy', 'text' => '删除', 'attr' => 'data-action=destroy'],
+                ],
+                'detailEnable' => true,
+                'detailTemplate' => '#:data.adapter_options#'
+            ],
+        ]);
+    }
+
     public function readAction()
     {
         $table = $this->getDataSourceConfigTable();

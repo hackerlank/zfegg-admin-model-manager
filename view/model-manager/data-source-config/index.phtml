@@ -83,6 +83,146 @@ $adapters = array(
                 }
             );
         });
+    });
 
+</script>
+
+
+<div id="modelManager-databaseConfig-index-grid"></div>
+
+<script>
+    $(function () {
+        var editors = {
+            editor: function (container, options) {
+                $('<textarea>').appendTo(container).kendoEditor({ resizable: true });
+            }
+        };
+        var config = <?=Zend\Json\Json::encode($config, false, array('enableJsonExprFinder' => true));?>;
+        var gridSettings = {};
+
+        if (config.columns) {
+            gridSettings.columns = config.columns;
+        }
+        if (config.detailEnable) {
+            gridSettings.detailTemplate = config.detailTemplate;
+        }
+        if (config.toolbar) {
+            gridSettings.toolbar= config.toolbar;
+        }
+
+        var $grid = $('#modelManager-databaseConfig-index-grid'),
+            serviceUrl = '<?=$this->url(null, ['controller' => $id])?>',
+            dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: '<?=$this->url(null, ['controller' => $id, 'action' => 'read'])?>',
+                    update: '<?=$this->url(null, ['controller' => $id, 'action' => 'update'])?>',
+                    destroy: '<?=$this->url(null, ['controller' => $id, 'action' => 'delete'])?>',
+                    create: '<?=$this->url(null, ['controller' => $id, 'action' => 'insert'])?>'
+                },
+                schema: {
+                    model: {
+                        id: config.primary,
+                        fields: config.fields
+                    },
+                    "data": "data",
+                    "total": "total"
+                },
+                pageSize: 20,
+                serverFiltering: true,
+                serverPaging: true,
+                serverSorting: true
+            });
+
+        $grid.kendoGrid($.extend({
+            dataSource: dataSource,
+            filterable: {
+                extra: false,
+                messages: {
+                    info: "查找: ",
+                    filter: "提交",
+                    clear: "清除",
+                    selectValue: "------选择------",
+                    and: "并且",
+                    or: "或者"
+                },
+                operators: {
+                    string: {
+                        eq: "等于",
+                        startswith:"右模糊查找",
+                        contains: "模糊查找"
+                    },
+                    number: {
+                        eq: "等于"
+                    },
+                    date: {
+                        ge: "大于等于",
+                        le: "小于",
+                        gt: "大于",
+                        lt: "小于"
+                    },
+                    enums: {
+                        eq: "满足条件"
+                    }
+                }
+            },
+            columns: [],
+            selectable: true,
+            editable: {
+                mode: "popup",
+                window: {
+                    width: 600
+                }
+            },
+            sortable: true,
+            change: function () {
+                $toolbar.find('a.k-button').removeAttr('disabled');
+            },
+            pageable: {
+                pageSizes: [20, 50, 100]
+            }
+        }, gridSettings));
+
+        var kGrid = $grid.data('kendoGrid'),
+            $toolbar = $grid.find('.k-grid-toolbar');
+
+        $toolbar.on('click', 'a', function () {
+
+            var action = $(this).data('action');
+
+            if (action == 'edit') {
+                kGrid.select().each(function () {
+                    kGrid.editRow(this);
+                });
+            } else if (action == 'destroy') {
+                kGrid.select().each(function () {
+                    kGrid.removeRow(this);
+                });
+            } else if (action == 'create') {
+                return ;
+            } else if (action == 'excel') {
+                window.location = '<?=$this->url(null, ['controller' => $id, 'action' => 'export-excel'])?>?'
+                + $.param({
+                    filter: kGrid.dataSource.filter(),
+                    sort: kGrid.dataSource.filter()
+                });
+            } else {
+                kGrid.select().each(function () {
+                    $.post(
+                        '<?=$this->url(null, ['controller' => $id, 'action' => 'execute'])?>',
+                        {
+                            method: action,
+                            row: kGrid.dataItem(this).toJSON()
+                        },
+                        function (r) {
+                            if (r.code === 0) {
+                                alert(r.msg);
+                            } else {
+                                alert(r.msg);
+                            }
+                        }
+                    );
+                });
+            }
+        });
     });
 </script>
