@@ -2,6 +2,8 @@
 
 namespace Zfegg\ModelManager\Controller;
 
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Metadata\Metadata;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -15,55 +17,52 @@ class DataSourceConfigController extends AbstractActionController
     public function indexAction()
     {
         $adapters = [
-            'Mysql',
-            'Oracle',
-            'IbmDB2',
-            'Sqlite',
-            'Pgsql',
-            'Sqlsrv',
+            'DbAdapter',
             'JsonRpc',
         ];
 
-        return new ViewModel([
-            'adapters' => $adapters,
-            'id'     => $this->params('__CONTROLLER__'),
-            'config' => [
-                'primary' => 'id',
-                'fields'  => [
-                    'id'    => ['type' => 'number', 'editable' => false, 'nullable' => true],
-                    'name'  => ['type' => 'string'],
-                    'adapter_options'  => ['type' => 'string'],
-                ],
-                'columns' => [
-                    [
-                        "field"      => "id",
-                        "title"      => "ID",
-                        "sortable"   => true,
-                        "filterable" => true,
-                        "width" => 100,
+        return new ViewModel(
+            [
+                'adapters' => $adapters,
+                'id'       => $this->params('__CONTROLLER__'),
+                'config'   => [
+                    'primary'        => 'id',
+                    'fields'         => [
+                        'id'              => ['type' => 'number', 'editable' => false, 'nullable' => true],
+                        'name'            => ['type' => 'string'],
+                        'adapter_options' => ['type' => 'string', 'defaultValue' => ['driver_options' => []]],
                     ],
-                    [
-                        "field"      => "name",
-                        "title"      => "名称",
-                        "filterable" => true,
-                        "width" => 250,
+                    'columns'        => [
+                        [
+                            "field"      => "id",
+                            "title"      => "ID",
+                            "sortable"   => true,
+                            "filterable" => true,
+                            "width"      => 100,
+                        ],
+                        [
+                            "field"      => "name",
+                            "title"      => "名称",
+                            "filterable" => true,
+                            "width"      => 250,
+                        ],
+                        [
+                            "field"      => "adapter",
+                            "title"      => "适配器",
+                            "values"     => $adapters,
+                            "filterable" => true,
+                        ],
                     ],
-                    [
-                        "field"      => "adapter",
-                        "title"      => "适配器",
-                        "values"     => $adapters,
-                        "filterable" => true,
+                    'toolbar'        => [
+                        ['name' => 'edit', 'text' => '编辑', 'attr' => 'data-action=edit disabled'],
+                        ['name' => 'create', 'text' => '增加', 'attr' => 'data-action=create'],
+                        ['name' => 'destroy', 'text' => '删除', 'attr' => 'data-action=destroy'],
                     ],
+                    'detailEnable'   => true,
+                    'detailTemplate' => '#:data.adapter_options#'
                 ],
-                'toolbar' => [
-                    ['name' => 'edit', 'text' => '编辑', 'attr' => 'data-action=edit disabled'],
-                    ['name' => 'create', 'text' => '增加', 'attr' => 'data-action=create'],
-                    ['name' => 'destroy', 'text' => '删除', 'attr' => 'data-action=destroy'],
-                ],
-                'detailEnable' => true,
-                'detailTemplate' => '#:data.adapter_options#'
-            ],
-        ]);
+            ]
+        );
     }
 
     public function readAction()
@@ -91,7 +90,7 @@ class DataSourceConfigController extends AbstractActionController
             return array('errors' => $baseConfigFilters->getMessages());
         }
 
-        $data   = $baseConfigFilters->getValues();
+        $data = $baseConfigFilters->getValues();
 
         if ($data['adapter'] == 'Restful') {
             $filter2 = new RestfulInputFilter();
@@ -123,6 +122,35 @@ class DataSourceConfigController extends AbstractActionController
         $table->insert($config);
 
         return new JsonModel(['code' => 1]);
+    }
+
+    public function testDbConnectionAction()
+    {
+        $filters = new DbInputFilter();
+        $filters->setData(
+            isset($_REQUEST['adapter_options']['driver_options']) ? $_REQUEST['adapter_options']['driver_options'] : []
+        );
+
+        if (!$filters->isValid()) {
+            return new JsonModel(['errors' => $filters->getMessages()]);
+        }
+
+        try {
+            $data     = array_filter($filters->getValues());
+            $adapter  = new Adapter($data);
+            $metadata = new Metadata($adapter);
+
+            $tables = [];
+            foreach ($metadata->getTables() as $table) {
+                foreach ($table->getColumns() as $column) {
+                    $tables[$table->getName()][] = $column->getName();
+                }
+            }
+
+            return new JsonModel(['tables' => $tables]);
+        } catch (\Exception $e) {
+            return new JsonModel(['errors' => $e->getMessage()]);
+        }
     }
 
     /**

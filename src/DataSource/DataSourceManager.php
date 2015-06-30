@@ -8,14 +8,9 @@ use Zend\ServiceManager\Exception;
 class DataSourceManager extends AbstractPluginManager
 {
     protected $invokableClasses = [
-        'mysql'   => 'Zfegg\ModelManager\DataSource\Mysql',
-        'oracle'  => 'Zfegg\ModelManager\DataSource\Oracle',
-        'ibmDB2'  => 'Zfegg\ModelManager\DataSource\IbmDB2',
-        'sqlite'  => 'Zfegg\ModelManager\DataSource\Sqlite',
-        'pgsql'   => 'Zfegg\ModelManager\DataSource\Pgsql',
-        'sqlsrv'  => 'Zfegg\ModelManager\DataSource\Sqlsrv',
-        'restful' => 'Zfegg\ModelManager\DataSource\Restful',
-        'jsonrpc' => 'Zfegg\ModelManager\DataSource\JsonRpc',
+        'dbadapter' => 'Zfegg\ModelManager\DataSource\DbAdapter',
+        'restful'   => 'Zfegg\ModelManager\DataSource\Restful',
+        'jsonrpc'   => 'Zfegg\ModelManager\DataSource\JsonRpc',
     ];
 
     /**
@@ -31,11 +26,13 @@ class DataSourceManager extends AbstractPluginManager
     public function validatePlugin($plugin)
     {
         if (!$plugin instanceof DataSourceInterface) {
-            throw new \InvalidArgumentException(sprintf(
-                'Plugin of type %s is invalid; must implement %s\DataSourceInterface',
-                (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
-                __NAMESPACE__
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Plugin of type %s is invalid; must implement %s\DataSourceInterface',
+                    (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
+                    __NAMESPACE__
+                )
+            );
         }
     }
 }

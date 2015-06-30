@@ -1,4 +1,4 @@
-<script type="text/x-kendo-template" id="modelManager-databaseConfig-template"  data-bind="value&#x3A;adapter">
+<script type="text/x-kendo-template" id="modelManager-databaseConfig-template">
     <div class="k-edit-form-container">
         <fieldset>
             <legend>基础配置:</legend>
@@ -13,79 +13,20 @@
                     'adapter',
                     ['options' => array_combine($adapters, $adapters),]
                 );
-                $select->setAttributes([
-                    'required' => true,
-                    'data-bind' => 'value:adapter',
-                    'data-role' => 'dropdownlist',
-                ]);
-                echo $this->formSelect($select);?>
+                $select->setAttributes(
+                    [
+                        'required'  => true,
+                        'data-bind' => 'value:adapter',
+                        'data-role' => 'dropdownlist',
+                    ]
+                );
+                echo $this->formSelect($select); ?>
             </div>
         </fieldset>
 
-        <fieldset type="adapter_options-container">
+        <fieldset>
             <legend>适配器配置:</legend>
-            <div type="db" class="hidden">
-                <fieldset>
-                    <legend>数据库配置</legend>
-                    <div class="k-edit-label"><label>地址</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][hostname]" required="required" data-bind="value:adapter_options.driver_options.hostname">
-                    </div>
-                    <div class="k-edit-label"><label>用户名</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][username]" required="required" data-bind="value:adapter_options.driver_options.username">
-                    </div>
-                    <div class="k-edit-label"><label>密码</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][password]" required="required" data-bind="value:adapter_options.driver_options.password">
-                    </div>
-                    <div class="k-edit-label"><label>端口</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][port]" required="required" data-bind="value:adapter_options.driver_options.port">
-                    </div>
-                    <div class="k-edit-label"><label>数据库</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][database]" required="required" data-bind="value:adapter_options.driver_options.database">
-                    </div>
-                    <div class="k-edit-label"><label>数据库编码</label></div>
-                    <div class="k-edit-field">
-                        <input type="text" class="k-input k-textbox" data-name="adapter_options[driver_options][charset]" required="required" data-bind="value:adapter_options.driver_options.charset">
-                    </div>
-                    <div class="k-edit-field">
-                        <button type="button">测试数据库连接</button>
-                    </div>
-                </fieldset>
-                <fieldset>
-                    <legend>查询配置</legend>
-                    <div class="k-edit-label"><label>配置模式</label></div>
-                    <div class="k-edit-field">
-<!--                        <input type="radio" name="adapter_options[query_mode]" value="normal" checked> 普通模式 <br>-->
-<!--                        <input type="radio" name="adapter_options[query_mode]" value="sql"> SQL模式 <br>-->
-                    </div>
-                    <fieldset>
-                        <legend>普通模式:</legend>
-<!--                        查询表: <select name="adapter_options[table]" id="ui-config-tables">-->
-<!--                            <option value=""> -- 选择数据表 --</option>-->
-<!--                        </select>-->
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>SQL模式:</legend>
-                        SQL 语句:
-                        <textarea rows="10" name="sql" class="k-textbox"></textarea>
-                    </fieldset>
-                </fieldset>
-            </div>
-            <div type="jsonrpc" class="hidden">
-                <div class="k-edit-label"><label>URL地址</label></div>
-                <div class="k-edit-field">
-<!--                    <input required name="adapter_options[url]" type="url" class="k-textbox">-->
-                </div>
-                <div class="k-edit-label"><label></label></div>
-                <div class="k-edit-field">
-                    <button>字段检测</button>
-                </div>
-            </div>
+            <div name="adapter_options-container"></div>
         </fieldset>
 
         <fieldset>
@@ -93,35 +34,168 @@
 
             <table>
                 <thead>
-                    <tr>
-                        <th></th>
-                        <th>字段名</th>
-                        <th>类型</th>
-                        <th>默认值</th>
-                        <th>可编辑</th>
-                        <th>可为空</th>
-                    </tr>
+                <tr>
+                    <th></th>
+                    <th>字段名</th>
+                    <th>类型</th>
+                    <th>默认值</th>
+                    <th>可编辑</th>
+                    <th>可为空</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="checkbox" checked value="1"></td>
-                        <td>x</td>
-                        <td><select>
-                                <option value="string">String</option>
-                                <option value="Int">Int</option>
-                                <option value="datetime">DataTime</option>
-                                <option value="Enum">Enum</option>
-                            </select></td>
-                        <td><input type="text"></td>
-                        <td><input type="checkbox" checked value="1"></td>
-                        <td><input type="checkbox" checked value="1"></td>
-                    </tr>
+                <tr>
+                    <td><input type="checkbox" checked value="1"></td>
+                    <td>x</td>
+                    <td><select>
+                            <option value="string">String</option>
+                            <option value="Int">Int</option>
+                            <option value="datetime">DataTime</option>
+                            <option value="Enum">Enum</option>
+                        </select></td>
+                    <td><input type="text"></td>
+                    <td><input type="checkbox" checked value="1"></td>
+                    <td><input type="checkbox" checked value="1"></td>
+                </tr>
                 </tbody>
             </table>
         </fieldset>
     </div>
 </script>
 
+<style>
+
+    .modelManager-adapter-queryOptions {
+        float: left;
+        margin-right: 8px;
+        min-width: 150px;
+    }
+</style>
+<script type="text/x-kendo-template" id="modelManager-databaseConfig-template-adapter-dbadapter">
+    <div>
+        <fieldset>
+            <legend>数据库配置</legend>
+            <div class="k-edit-label"><label>数据库类型</label></div>
+            <div class="k-edit-field">
+                <select name="adapter_options[driver_options][driver]" required="required">
+                    <option value="pdo_mysql">Mysql</option>
+                    <option value="ibmdb2">ibmdb2</option>
+                    <option value="pdo_oci">Oracle</option>
+                    <option value="pdo_pgsql">PgSql</option>
+                    <option value="pdo_sqlite">Sqlite</option>
+                    <option value="pdo_sqlsrv">SqlServer</option>
+                </select>
+            </div>
+            <div class="k-edit-label"><label>地址</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][hostname]"
+                       required="required">
+            </div>
+            <div class="k-edit-label"><label>用户名</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][username]"
+                       required="required">
+            </div>
+            <div class="k-edit-label"><label>密码</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][password]"
+                       required="required" value="">
+            </div>
+            <div class="k-edit-label"><label>端口</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][port]"
+                       required="required" data-bind="value:adapter_options.driver_options.port">
+            </div>
+            <div class="k-edit-label"><label>数据库</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][database]"
+                       required="required" value="redmine">
+            </div>
+            <div class="k-edit-label"><label>数据库编码</label></div>
+            <div class="k-edit-field">
+                <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][charset]"
+                       required="required" data-bind="value:adapter_options.driver_options.charset">
+            </div>
+            <div class="k-edit-field">
+                <button type="button" data-name="test">测试数据库连接</button>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>查询配置</legend>
+            <div class="k-edit-label"><label>配置模式</label></div>
+            <div class="k-edit-field">
+                <label><input type="radio" name="adapter_options[query_options][mode]" value="normal" checked> 普通模式 </label>&nbsp;
+                <label><input type="radio" name="adapter_options[query_options][mode]" value="sql"> SQL模式 </label><br>
+            </div>
+            <div class="clear"></div>
+            <fieldset role="mode_normal">
+                <legend>普通模式:</legend>
+                <div class="modelManager-adapter-queryOptions">
+                选择查询表:<br>
+                <select name="adapter_options[query_options][table]" size="10">
+                </select>
+                </div>
+                <div class="modelManager-adapter-queryOptions">
+                    选择查询字段:<br>
+                    <select name="adapter_options[query_options][column]" multiple size="10">
+                    </select>
+                </div>
+                <div class="modelManager-adapter-queryOptions" role="where">
+                    选择默认查询条件:<br>
+                    <p>
+                        <select name="adapter_options[query_options][where][left][]">
+                        </select>
+                        <select name="adapter_options[query_options][where][operator][]">
+                            <option value="=">=</option>
+                            <option value="<>">&lt;&gt;</option>
+                            <option value="<">&lt;</option>
+                            <option value="<=">&lt;=</option>
+                            <option value=">">&gt;</option>
+                            <option value=">=">&gt;=</option>
+                            <option value="like">like</option>
+                            <option value="notLike">not like</option>
+                            <option value="isNull">is null</option>
+                            <option value="isNotNull">is not null</option>
+                        </select>
+                        <input name="adapter_options[query_options][where][right][]">
+                        <button value="-">-</button>
+                    </p>
+                    <button value="+">+</button>
+                </div>
+                <div class="modelManager-adapter-queryOptions">
+                    选择默认排序:<br>
+                    <select name="adapter_options[query_options][order]" multiple size="10">
+                    </select>
+                </div>
+                <div class="clear"></div>
+                <br>
+                <div>
+                    SQL 预览:<br>
+                    <pre role="pre_sql"></pre>
+                </div>
+            </fieldset>
+            <div class="clear"></div>
+            <fieldset>
+                <legend>SQL模式:</legend>
+                SQL 语句:
+                <textarea rows="10" name="adapter_options[query_options][sql]" class="k-textbox"></textarea>
+            </fieldset>
+        </fieldset>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="modelManager-databaseConfig-template-adapter-jsonrpc">
+    <div type="jsonrpc" class="hidden">
+        <div class="k-edit-label"><label>URL地址</label></div>
+        <div class="k-edit-field">
+            <input required name="adapter_options[url]" type="url" class="k-textbox">
+        </div>
+        <div class="k-edit-label"><label></label></div>
+        <div class="k-edit-field">
+            <button>字段检测</button>
+        </div>
+    </div>
+</script>
 
 <div id="modelManager-databaseConfig-index-grid"></div>
 
@@ -205,7 +279,10 @@
             editable: {
                 mode: "popup",
                 window: {
-                    width: '100%'
+                    width: '100%',
+                    open: function () {
+                        this.maximize();
+                    }
                 },
                 template: kendo.template($("#modelManager-databaseConfig-template").html().replace('&#x3A;', ':'))
             },
@@ -263,25 +340,102 @@
     });
 </script>
 
-
 <script>
     $(function () {
 
         var $grid = $('#modelManager-databaseConfig-index-grid'),
+            kTmplDb = kendo.template($('#modelManager-databaseConfig-template-adapter-dbadapter').html()),
+            kTmplJsonPpc = kendo.template($('#modelManager-databaseConfig-template-adapter-jsonrpc').html()),
             kGrid = $grid.data('kendoGrid'),
             editorInit = {
                 testDatabase: function () {
 
                 }
+            },
+
+            initDbEvent = function ($elm) {
+                $elm.find('button[data-name=test]').click(function () {
+                    var $tmpForm = $('<form>');
+                    $tmpForm.append($(this).closest('fieldset').clone());
+                    $tmpForm.submit(function () {
+                        $.post(
+                            '<?=$this->url(null, ['action' => 'test-db-connection'], true)?>',
+                            $tmpForm.serialize(),
+                            function (r) {
+                                if (r.errors) {
+                                    alert(r.errors);
+                                } else {
+                                    alert('连接成功');
+                                    initSelectMode($elm, r.tables);
+
+                                }
+                            }
+                        );
+                        return false;
+                    }).submit();
+                });
+            },
+            initSelectMode = function ($elm, tables) {
+                var getSelect = function (name) { return $('select[name="adapter_options[query_options]['+name+']"]', $elm);},
+                    $selectTable = getSelect('table'),
+                    $selectColumn = getSelect('column'),
+                    $selectOrder = getSelect('order'),
+                    $whereSelect = $('div[class=modelManager-adapter-queryOptions][role=where]', $elm),
+                    $whereItem = $whereSelect.children('p').clone(),
+                    $viewNormalMode = $('fieldset[role="mode_normal"]', $elm),
+                    $sqlPreview = $('textarea[role=pre_sql]', $elm)
+                    ;
+                $whereSelect.children('p').remove();
+                $whereSelect.on('click', 'button[value="+"]', function () {
+                    $(this).before($whereItem.clone());
+                }).on('click', 'button[value="-"]', function () {
+                    $(this).parent().remove();
+                });
+                $selectTable.change(function () {
+                    $selectColumn.empty();
+                    $selectOrder.empty();
+                    $whereSelect.children('p').remove();
+                    $whereItem.find('select:eq(0)').children('option').remove();
+                    var table = this.value;
+                    $.each(tables[table], function (i, column) {
+                        $selectColumn.append('<option value="'+column+'">'+column+'</option>');
+                        $selectOrder.append('<option value="'+column+' ASC">'+column+' ASC</option>');
+                        $selectOrder.append('<option value="'+column+' DESC">'+column+' DESC</option>');
+                        $whereItem.find('select:eq(0)').append('<option value="'+column+'">'+column+'</option>');
+                    });
+                    $whereSelect.children('button[value="+"]').click();
+                });
+                $selectTable.data('columns', tables);
+                $.each(tables, function (table, columns) {
+                    $selectTable.append('<option value="'+table+'">'+table+'</option>');
+                });
+
+                $elm.on('change', 'select', function () {
+                    var sql = "SELECT ";
+
+                    if ($selectColumn.val().length) {
+                        sql += $selectColumn.val().join(', ');
+                    } else {
+                        sql += ' * ';
+                    }
+                    sql += ' FROM ';
+                    sql += $selectTable.val();
+
+                    if ($whereSelect.find('select[name="adapter_options[query_options][where][left][]"]').size()) {
+
+                    }
+                });
             };
 
-
         kGrid.bind('edit', function (e) {
-
-            var optionsContainer = $('fieldset[type="adapter_options-container"]', e.container);
+            var optionsContainer = $('div[name="adapter_options-container"]', e.container);
+            console.log(e);
             e.container.find('select[name=adapter]').change(function () {
-                var viewType = this.value.toLowerCase() == 'jsonrpc' ? $('div[type=jsonrpc]', e.container) : $('div[type=db]', e.container);
-                viewType.show().siblings('div').hide();
+                var viewType = this.value.toLowerCase() == 'jsonrpc' ? kTmplJsonPpc(e.model) : kTmplDb(e.model),
+                    $viewType = $(viewType);
+                initDbEvent($viewType);
+
+                optionsContainer.empty().append($viewType)
             });
         });
     });

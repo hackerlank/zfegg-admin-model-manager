@@ -9,11 +9,9 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
-abstract class AbstractDbAdapterDataSource implements DataSourceInterface
+class DbAdapter implements DataSourceInterface
 {
     use OptionsTrait;
-
-    const DRIVER = 'pdo_mysql';
 
     protected $driverOptions = [];
     protected $metadata;
@@ -50,7 +48,7 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
     public function getDbAdapter()
     {
         if (!$this->dbAdapter) {
-            $adapter = new Adapter(['driver' => static::DRIVER] + $this->getDriverOptions());
+            $adapter = new Adapter($this->getDriverOptions());
             $this->setDbAdapter($adapter);
         }
         return $this->dbAdapter;
@@ -149,5 +147,15 @@ abstract class AbstractDbAdapterDataSource implements DataSourceInterface
     public function insert(array $data)
     {
 
+    }
+
+    public function select($where = [], $sort = [])
+    {
+        // TODO: Implement select() method.
+    }
+
+    public function delete(array $data)
+    {
+        // TODO: Implement delete() method.
     }
 }

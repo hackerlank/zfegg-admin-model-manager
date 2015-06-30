@@ -8,8 +8,30 @@ class DbInputFilter extends InputFilter
 
     public function __construct()
     {
-        $inputFilter = new InputFilter();
 
+        $this->add(
+            [
+                'name'    => 'driver',
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'InArray',
+                        'options' => [
+                            'haystack' => [
+                                'pdo_mysql',
+                                'ibmdb2',
+                                'pdo_oci',
+                                'pdo_pgsql',
+                                'pdo_sqlite',
+                                'pdo_sqlsrv',
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
         $this->add(
             [
                 'name'    => 'hostname',
