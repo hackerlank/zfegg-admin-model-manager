@@ -32,7 +32,7 @@
         <fieldset>
             <legend>数据源字段配置:</legend>
 
-            <table>
+            <table name="fields-container">
                 <thead>
                 <tr>
                     <th></th>
@@ -44,27 +44,30 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td><input type="checkbox" checked value="1"></td>
-                    <td>x</td>
-                    <td><select>
-                            <option value="string">String</option>
-                            <option value="Int">Int</option>
-                            <option value="datetime">DataTime</option>
-                            <option value="Enum">Enum</option>
-                        </select></td>
-                    <td><input type="text"></td>
-                    <td><input type="checkbox" checked value="1"></td>
-                    <td><input type="checkbox" checked value="1"></td>
-                </tr>
                 </tbody>
             </table>
         </fieldset>
     </div>
 </script>
+<script type="text/x-kendo-template" id="modelManager-databaseConfig-template-fields">
+    # for (var name in fields) { #
+    <tr>
+        <td><input type="checkbox" checked value="1"></td>
+        <td>#:name#</td>
+        <td><select>
+                <option value="string">String</option>
+                <option value="Int">Int</option>
+                <option value="datetime">DataTime</option>
+                <option value="Enum">Enum</option>
+            </select></td>
+        <td><input type="text" value="#:fields.defaultValue#"></td>
+        <td><input type="checkbox" #:fields.editable ? "checked" : ""# value="1"></td>
+        <td><input type="checkbox" #:fields.nullable ? "checked" : ""# value="1"></td>
+    </tr>
+    # } #
+</script>
 
 <style>
-
     .modelManager-adapter-queryOptions {
         float: left;
         margin-right: 8px;
@@ -89,17 +92,17 @@
             <div class="k-edit-label"><label>地址</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][hostname]"
-                       required="required">
+                       required="required" value="192.168.39.18">
             </div>
             <div class="k-edit-label"><label>用户名</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][username]"
-                       required="required">
+                       required="required" value="root">
             </div>
             <div class="k-edit-label"><label>密码</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][password]"
-                       required="required" value="">
+                       required="required" value="ztgame@123">
             </div>
             <div class="k-edit-label"><label>端口</label></div>
             <div class="k-edit-field">
@@ -125,7 +128,7 @@
             <div class="k-edit-label"><label>配置模式</label></div>
             <div class="k-edit-field">
                 <label><input type="radio" name="adapter_options[query_options][mode]" value="normal" checked> 普通模式 </label>&nbsp;
-                <label><input type="radio" name="adapter_options[query_options][mode]" value="sql"> SQL模式 </label><br>
+                <label><input disabled type="radio" name="adapter_options[query_options][mode]" value="sql"> SQL模式 </label><br>
             </div>
             <div class="clear"></div>
             <fieldset role="mode_normal">
@@ -185,6 +188,7 @@
 </script>
 
 <script type="text/x-kendo-template" id="modelManager-databaseConfig-template-adapter-jsonrpc">
+
     <div type="jsonrpc" class="hidden">
         <div class="k-edit-label"><label>URL地址</label></div>
         <div class="k-edit-field">
@@ -346,6 +350,7 @@
         var $grid = $('#modelManager-databaseConfig-index-grid'),
             kTmplDb = kendo.template($('#modelManager-databaseConfig-template-adapter-dbadapter').html()),
             kTmplJsonPpc = kendo.template($('#modelManager-databaseConfig-template-adapter-jsonrpc').html()),
+            kTmplFields = kendo.template($('#modelManager-databaseConfig-template-fields').html()),
             kGrid = $grid.data('kendoGrid'),
             editorInit = {
                 testDatabase: function () {
@@ -383,7 +388,7 @@
                     $whereSelect = $('div[class=modelManager-adapter-queryOptions][role=where]', $elm),
                     $whereItem = $whereSelect.children('p').clone(),
                     $viewNormalMode = $('fieldset[role="mode_normal"]', $elm),
-                    $sqlPreview = $('textarea[role=pre_sql]', $elm)
+                    $sqlPreview = $('pre[role=pre_sql]', $elm)
                     ;
                 $whereSelect.children('p').remove();
                 $whereSelect.on('click', 'button[value="+"]', function () {
@@ -403,17 +408,15 @@
                         $selectOrder.append('<option value="'+column+' DESC">'+column+' DESC</option>');
                         $whereItem.find('select:eq(0)').append('<option value="'+column+'">'+column+'</option>');
                     });
-                    $whereSelect.children('button[value="+"]').click();
                 });
-                $selectTable.data('columns', tables);
                 $.each(tables, function (table, columns) {
                     $selectTable.append('<option value="'+table+'">'+table+'</option>');
                 });
 
-                $elm.on('change', 'select', function () {
+                $elm.on('change', 'select,input', function () {
                     var sql = "SELECT ";
 
-                    if ($selectColumn.val().length) {
+                    if ($selectColumn.val()) {
                         sql += $selectColumn.val().join(', ');
                     } else {
                         sql += ' * ';
@@ -422,20 +425,48 @@
                     sql += $selectTable.val();
 
                     if ($whereSelect.find('select[name="adapter_options[query_options][where][left][]"]').size()) {
-
+                        var conds = [];
+                        $whereSelect.find('select[name="adapter_options[query_options][where][left][]"]').each(function () {
+                            conds.push(this.value + ' ' + $(this).next().val() + ' ' + JSON.stringify($(this).next().next().val()));
+                        });
+                        if (conds.length) {
+                            sql += ' WHERE ' + conds.join(' AND ');
+                        }
                     }
+
+                    if ($selectOrder.val()) {
+                        sql += ' ORDER BY ';
+                        var sorts = [];
+                        $.each($selectOrder.val(), function (i, val) {
+                            sorts.push(val);
+                        });
+                        sql += sorts.join(',');
+                    }
+
+                    $sqlPreview.html(sql);
+
+                    fieldsContainer.trigger('init', [tables[$selectTable.val()]]);
                 });
-            };
+            },
+            fieldsContainer;
 
         kGrid.bind('edit', function (e) {
-            var optionsContainer = $('div[name="adapter_options-container"]', e.container);
-            console.log(e);
-            e.container.find('select[name=adapter]').change(function () {
+            var optionsContainer = $('div[name="adapter_options-container"]', e.container),
+                adapterSelect = e.container.find('select[name=adapter]');
+
+            fieldsContainer = e.container.find('table[name="fields-container"]');
+
+            adapterSelect.change(function () {
                 var viewType = this.value.toLowerCase() == 'jsonrpc' ? kTmplJsonPpc(e.model) : kTmplDb(e.model),
                     $viewType = $(viewType);
                 initDbEvent($viewType);
 
                 optionsContainer.empty().append($viewType)
+            });
+            fieldsContainer.bind('init', function (e, fields) {
+                var $this = $(this);
+                console.log(arguments);
+                $this.find('tbody').append(kTmplFields({fields: fields}));
             });
         });
     });

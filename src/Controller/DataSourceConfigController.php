@@ -142,8 +142,24 @@ class DataSourceConfigController extends AbstractActionController
 
             $tables = [];
             foreach ($metadata->getTables() as $table) {
-                foreach ($table->getColumns() as $column) {
-                    $tables[$table->getName()][] = $column->getName();
+                /** @var \Zend\Db\Metadata\Object\ColumnObject[] $columns */
+                $columns = $table->getColumns();
+                foreach ($columns as $column) {
+                    if (strpos($column->getDataType(), 'int') !== false) {
+                        $type = 'int';
+                    } else if (strpos($column->getDataType(), 'date') !== false ) {
+                        $type = 'date';
+                    } else if (strtolower($column->getDataType()) == 'timestamp') {
+                        $type = 'timestamp';
+                    } else {
+                        $type = 'string';
+                    }
+
+                    $tables[$table->getName()][$column->getName()] = [
+                        'nullable' => $column->getIsNullable(),
+                        'default' => $column->getColumnDefault(),
+                        'type' => $type,
+                    ];
                 }
             }
 
