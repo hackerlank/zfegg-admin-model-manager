@@ -146,18 +146,18 @@ class DataSourceConfigController extends AbstractActionController
                 $columns = $table->getColumns();
                 foreach ($columns as $column) {
                     if (strpos($column->getDataType(), 'int') !== false) {
-                        $type = 'int';
+                        $type = 'number';
                     } else if (strpos($column->getDataType(), 'date') !== false ) {
                         $type = 'date';
                     } else if (strtolower($column->getDataType()) == 'timestamp') {
-                        $type = 'timestamp';
+                        $type = 'date';
                     } else {
                         $type = 'string';
                     }
 
                     $tables[$table->getName()][$column->getName()] = [
                         'nullable' => $column->getIsNullable(),
-                        'default' => $column->getColumnDefault(),
+                        'defaultValue' => $column->getColumnDefault() == 'null' ? null : $column->getColumnDefault(),
                         'type' => $type,
                     ];
                 }

@@ -55,14 +55,14 @@
         <td><input type="checkbox" checked value="1"></td>
         <td>#:name#</td>
         <td><select>
-                <option value="string">String</option>
-                <option value="Int">Int</option>
-                <option value="datetime">DataTime</option>
-                <option value="Enum">Enum</option>
+                <option value="string" # fields[name].type == 'string' ? 'selected' : '' #>String</option>
+                <option value="number" # fields[name].type == 'number' ? 'selected' : '' #>Number</option>
+                <option value="date" # fields[name].type == 'date' ? 'selected' : '' #>Date</option>
+                <option value="boolean" # fields[name].type == 'boolean' ? 'selected' : '' #>boolean</option>
             </select></td>
-        <td><input type="text" value="#:fields.defaultValue#"></td>
-        <td><input type="checkbox" #:fields.editable ? "checked" : ""# value="1"></td>
-        <td><input type="checkbox" #:fields.nullable ? "checked" : ""# value="1"></td>
+        <td><input type="text" value="#:fields[name].defaultValue || ''#"></td>
+        <td><input type="checkbox" #:fields[name].editable ? "checked" : ""# value="1"></td>
+        <td><input type="checkbox" #:fields[name].nullable ? "checked" : ""# value="1"></td>
     </tr>
     # } #
 </script>
@@ -92,17 +92,17 @@
             <div class="k-edit-label"><label>地址</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][hostname]"
-                       required="required" value="192.168.39.18">
+                       required="required" value="">
             </div>
             <div class="k-edit-label"><label>用户名</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][username]"
-                       required="required" value="root">
+                       required="required" value="">
             </div>
             <div class="k-edit-label"><label>密码</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][password]"
-                       required="required" value="ztgame@123">
+                       required="required" value="">
             </div>
             <div class="k-edit-label"><label>端口</label></div>
             <div class="k-edit-field">
@@ -112,7 +112,7 @@
             <div class="k-edit-label"><label>数据库</label></div>
             <div class="k-edit-field">
                 <input type="text" class="k-input k-textbox" name="adapter_options[driver_options][database]"
-                       required="required" value="redmine">
+                       required="required" value="">
             </div>
             <div class="k-edit-label"><label>数据库编码</label></div>
             <div class="k-edit-field">
@@ -402,7 +402,8 @@
                     $whereSelect.children('p').remove();
                     $whereItem.find('select:eq(0)').children('option').remove();
                     var table = this.value;
-                    $.each(tables[table], function (i, column) {
+                    $.each(tables[table], function (column, attrs) {
+
                         $selectColumn.append('<option value="'+column+'">'+column+'</option>');
                         $selectOrder.append('<option value="'+column+' ASC">'+column+' ASC</option>');
                         $selectOrder.append('<option value="'+column+' DESC">'+column+' DESC</option>');
@@ -445,6 +446,14 @@
 
                     $sqlPreview.html(sql);
 
+                    if ($selectColumn.val()) {
+                        var selectColumns = {};
+                        $.each($selectColumn.val(), function (i, name) {
+                            selectColumns[name] = tables[$selectTable.val()][name];
+                        });
+                    } else {
+                        selectColumns = tables[$selectTable.val()];
+                    }
                     fieldsContainer.trigger('init', [tables[$selectTable.val()]]);
                 });
             },
@@ -464,9 +473,9 @@
                 optionsContainer.empty().append($viewType)
             });
             fieldsContainer.bind('init', function (e, fields) {
-                var $this = $(this);
-                console.log(arguments);
-                $this.find('tbody').append(kTmplFields({fields: fields}));
+                var $tbody = $(this).find('tbody');
+                $tbody.empty();
+                $tbody.append(kTmplFields({fields: fields}));
             });
         });
     });
