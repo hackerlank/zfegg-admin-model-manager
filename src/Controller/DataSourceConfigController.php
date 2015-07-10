@@ -8,8 +8,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\BaseConfigInputFilter;
-use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbInputFilter;
-use Zfegg\ModelManager\InputFilter\DataSourceConfig\RestfulInputFilter;
+use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbAdapterInputFilter;
+use Zfegg\ModelManager\InputFilter\DataSourceConfig\JsonRpcInputFilter;
 
 class DataSourceConfigController extends AbstractActionController
 {
@@ -73,43 +73,28 @@ class DataSourceConfigController extends AbstractActionController
         $paginator = $table->fetchPaginator();
         $paginator->setCurrentPageNumber($this->getRequest()->getPost('page', 1));
 
-        return [
+        return new JsonModel([
             'total' => $paginator->getTotalItemCount(),
             'data'  => $paginator->getCurrentItems()->toArray(),
-        ];
+        ]);
     }
 
     public function addAction()
     {
+        if (!$this->getRequest()->isPost()) {
+            return new ViewModel();
+        }
 
-        $baseConfigFilters = new BaseConfigInputFilter();
+        $baseConfigFilters = new BaseConfigInputFilter($this->getRequest()->getPost('adapter'));
 
         $baseConfigFilters->setData($_REQUEST);
 
         if (!$baseConfigFilters->isValid()) {
-            return array('errors' => $baseConfigFilters->getMessages());
+            return new JsonModel(['errors' => $baseConfigFilters->getMessages()]);
         }
 
         $data = $baseConfigFilters->getValues();
-
-        if ($data['adapter'] == 'Restful') {
-            $filter2 = new RestfulInputFilter();
-            $filter2->setData($_REQUEST);
-            if (!$filter2->isValid()) {
-                return ['errors' => $filter2->getMessages()];
-            }
-
-            $data += $filter2->getValues();
-        } else {
-            $filter2 = new DbInputFilter();
-            $filter2->setData($this->getRequest()->getPost('driver_options', []));
-            if (!$filter2->isValid()) {
-                return ['errors' => $filter2->getMessages()];
-            }
-
-            $data += ['driver_options' => $filter2->getValues()];
-        }
-
+        var_dump($data);exit;
 
         $table  = $this->getDataSourceConfigTable();
         $config = array(
@@ -126,7 +111,7 @@ class DataSourceConfigController extends AbstractActionController
 
     public function testDbConnectionAction()
     {
-        $filters = new DbInputFilter();
+        $filters = new DbAdapterInputFilter();
         $filters->setData(
             isset($_REQUEST['adapter_options']['driver_options']) ? $_REQUEST['adapter_options']['driver_options'] : []
         );

@@ -4,7 +4,7 @@ namespace Zfegg\ModelManager\InputFilter\DataSourceConfig;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\ArrayInput;
 
-class RestfulInputFilter extends InputFilter
+class JsonRpcInputFilter extends InputFilter
 {
 
     public function __construct()

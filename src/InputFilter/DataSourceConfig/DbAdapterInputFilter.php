@@ -3,12 +3,11 @@
 namespace Zfegg\ModelManager\InputFilter\DataSourceConfig;
 use Zend\InputFilter\InputFilter;
 
-class DbInputFilter extends InputFilter
+class DbAdapterInputFilter extends InputFilter
 {
 
     public function __construct()
     {
-
         $this->add(
             [
                 'name'    => 'driver',

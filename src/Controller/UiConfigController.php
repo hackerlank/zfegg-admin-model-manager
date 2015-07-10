@@ -22,9 +22,9 @@ class UiConfigController extends AbstractActionController
             }
         );
 
-        return array(
+        return new JsonModel([
             'data_source' => $result->toArray(),
-        );
+        ]);
     }
 
     public function readAction()
@@ -39,10 +39,10 @@ class UiConfigController extends AbstractActionController
         );
         $paginator->setCurrentPageNumber($this->getRequest()->getPost('page', 1));
 
-        return [
+        return new JsonModel([
             'total' => $paginator->getTotalItemCount(),
             'data'  => $paginator->getCurrentItems()->toArray(),
-        ];
+        ]);
     }
 
     public function getTablesAction()
@@ -66,10 +66,10 @@ class UiConfigController extends AbstractActionController
             $error  = $e->getMessage();
         }
 
-        return array(
+        return new JsonModel([
             'tables' => $tables,
             'error'  => $error
-        );
+        ]);
     }
 
     public function saveAction()
@@ -78,7 +78,7 @@ class UiConfigController extends AbstractActionController
         $filters->setData($_REQUEST);
 
         if (!$filters->isValid()) {
-            return ['errors' => $filters->getMessages()];
+            return new JsonModel(['errors' => $filters->getMessages()]);
         }
 
         $data = $filters->getValues();
@@ -87,7 +87,7 @@ class UiConfigController extends AbstractActionController
             $filters2 = new DbUiConfigInputFilter();
             $filters2->setData($this->getRequest()->getPost('source_config'));
             if (!$filters2->isValid()) {
-                return ['errors' => $filters2->getMessages()];
+                return new JsonModel(['errors' => $filters2->getMessages()]);
             }
 
             $data += ['source_config' => json_encode($filters2->getValues())];

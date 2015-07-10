@@ -7,8 +7,12 @@ use Zend\InputFilter\InputFilter;
 class BaseConfigInputFilter extends InputFilter
 {
 
-    public function __construct()
+    public function __construct($adapter)
     {
+        $adapters = [
+            'DbAdapter',
+            'JsonRpc',
+        ];
         $this->add(
             [
                 'name'    => 'name',
@@ -24,20 +28,20 @@ class BaseConfigInputFilter extends InputFilter
                     [
                         'name'    => 'InArray',
                         'options' => [
-                            'haystack' => [
-                                'Mysql'   => 'Mysql',
-                                'Oracle'  => 'Oracle',
-                                'IbmDB2'  => 'IbmDB2',
-                                'Sqlite'  => 'Sqlite',
-                                'Pgsql'   => 'Pgsql',
-                                'Sqlsrv'  => 'Sqlsrv',
-                                'Restful' => 'Restful',
-                            ],
+                            'haystack' => $adapters,
                         ]
                     ]
                 ],
             ]
         );
+
+        if ($adapter == 'DbAdapter') {
+            $adapterOptionsFilter = new InputFilter();
+            $adapterOptionsFilter->add(new DbAdapterInputFilter(), 'driver_options');
+            $adapterOptionsFilter->add(new DbAdapterQueryOptionsInputFilter(), 'query_options');
+
+            $this->add($adapterOptionsFilter, 'adapter_options');
+        }
     }
 
 }

@@ -3,6 +3,7 @@
 namespace Zfegg\ModelManager\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class SourceController extends AbstractActionController
@@ -42,13 +43,13 @@ class SourceController extends AbstractActionController
             $dataSource->setDataConfig((array)$config['source_config']);
             $paginator = $dataSource->fetchPaginator($this->ui()->filter());
         } catch (\Exception $e) {
-            return ['error' => $e->getMessage()];
+            return new JsonModel(['error' => $e->getMessage()]);
         }
 
-        return [
+        return new JsonModel([
             'total' => $paginator->getTotalItemCount(),
             'data'  => (array) $paginator->getCurrentItems(),
-        ];
+        ]);
     }
 
     /**
