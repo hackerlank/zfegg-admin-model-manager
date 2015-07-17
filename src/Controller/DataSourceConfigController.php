@@ -5,11 +5,14 @@ namespace Zfegg\ModelManager\Controller;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Metadata\Metadata;
 use Zend\Db\Sql\Select;
+use Zend\Json\Server\Client;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Validator\Uri;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\BaseConfigInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbAdapterInputFilter;
+use Zfegg\ModelManager\InputFilter\DataSourceConfig\JsonRpcInputFilter;
 
 class DataSourceConfigController extends AbstractActionController
 {
@@ -89,7 +92,10 @@ class DataSourceConfigController extends AbstractActionController
             return new ViewModel();
         }
 
-        $baseConfigFilters = new BaseConfigInputFilter($this->getRequest()->getPost('adapter'));
+        $baseConfigFilters = new BaseConfigInputFilter(
+            $this->getRequest()->getPost('adapter'),
+            $this->getDataSourceConfigTable()
+        );
 
         $baseConfigFilters->setData($_REQUEST);
 
@@ -149,6 +155,23 @@ class DataSourceConfigController extends AbstractActionController
             }
 
             return new JsonModel(['tables' => $tables]);
+        } catch (\Exception $e) {
+            return new JsonModel(['errors' => $e->getMessage()]);
+        }
+    }
+
+    public function testJsonrpcAction()
+    {
+        $filters = new JsonRpcInputFilter();
+        $filters->setData($_REQUEST);
+
+        if (!$filters->isValid()) {
+            return new JsonModel(['errors' => $filters->getMessages()]);
+        }
+
+        try {
+            $client = new Client($filters->getValue('url'));
+            return new JsonModel(['fields' => $client->call('meta')]);
         } catch (\Exception $e) {
             return new JsonModel(['errors' => $e->getMessage()]);
         }

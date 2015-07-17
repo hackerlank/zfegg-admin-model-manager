@@ -2,25 +2,35 @@
 
 namespace Zfegg\ModelManager\InputFilter\DataSourceConfig;
 
+use Zend\Db\TableGateway\TableGateway;
 use Zend\InputFilter\ArrayInput;
 use Zend\InputFilter\InputFilter;
 
 class BaseConfigInputFilter extends InputFilter
 {
 
-    public function __construct($adapter)
+    public function __construct($adapter, TableGateway $table)
     {
         $adapters = [
             'DbAdapter',
             'JsonRpc',
         ];
 
-
         $this->add(
             [
                 'name'    => 'name',
                 'filters' => [
                     ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name'    => 'Db\NoRecordExists',
+                        'options' => [
+                            'table'   => $table->getTable(),
+                            'field'   => 'name',
+                            'adapter' => $table->getAdapter()
+                        ],
+                    ],
                 ],
             ]
         );
@@ -44,6 +54,21 @@ class BaseConfigInputFilter extends InputFilter
             $adapterOptionsFilter->add($this->getQueryOptionsInputFilter(), 'query_options');
 
             $this->add($adapterOptionsFilter, 'adapter_options');
+        } else if ($adapter == 'JsonRpc') {
+            $this->add([
+                'type' => InputFilter::class,
+                [
+                    'name' => 'url',
+                    'validators' => [
+                        [
+                            'name' => 'uri',
+                            'options' => [
+                                'allowRelative' => false,
+                            ]
+                        ]
+                    ]
+                ]
+            ], 'adapter_options');
         }
 
         $this->add(

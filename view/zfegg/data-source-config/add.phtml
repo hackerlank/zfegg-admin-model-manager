@@ -8,9 +8,9 @@
             </div>
             <div class="k-edit-label"><label for="adapter">数据源适配器</label></div>
             <div class="k-edit-field">
-                <select name="adapter" required data-role="dropdownlist">
+                <select name="adapter" required>
                     <option value="DbAdapter">DbAdapter</option>
-                    <option value="JsonRPC">JsonRPC</option>
+                    <option value="JsonRpc">JsonRPC</option>
                 </select>
             </div>
         </fieldset>
@@ -50,7 +50,7 @@
                 <option value="string" # fields[name].type== 'string' ? 'selected' : '' #>String</option>
                 <option value="number" # fields[name].type== 'number' ? 'selected' : '' #>Number</option>
                 <option value="date" # fields[name].type== 'date' ? 'selected' : '' #>Date</option>
-                <option value="boolean" # fields[name].type== 'boolean' ? 'selected' : '' #>boolean</option>
+                <option value="boolean" # fields[name].type== 'boolean' ? 'selected' : '' #>Boolean</option>
             </select></td>
         <td><input name="fields[#:name#][defaultValue]" type="text" value="#:fields[name].defaultValue || ''#"></td>
         <td><input name="fields[#:name#][editable]" type="checkbox" #:fields[name].editable ? "checked" : ""# value="1"></td>
@@ -183,14 +183,14 @@
 </script>
 
 <script type="text/x-kendo-template" id="modelManager-databaseConfig-template-adapter-jsonrpc">
-    <div type="jsonrpc" class="hidden">
+    <div>
         <div class="k-edit-label"><label>URL地址</label></div>
         <div class="k-edit-field">
             <input required name="adapter_options[url]" type="url" class="k-textbox">
         </div>
         <div class="k-edit-label"><label></label></div>
         <div class="k-edit-field">
-            <button>字段检测</button>
+            <button type="button" data-name="test-jsonrpc">字段检测</button>
         </div>
     </div>
 </script>
@@ -306,6 +306,27 @@
                     }
                     $fieldsContainer.trigger('init', [selectColumns]);
                 });
+            },
+            initJsonRpc = function () {
+                var $view = $(kTmplJsonPpc({}));
+
+                var $url = $view.find('input[name="adapter_options[url]"]');
+                $view.on('click', 'button[data-name="test-jsonrpc"]', function (e) {
+                    $.post(
+                        '<?=$this->url(null, ['action' => 'test-jsonrpc'], true)?>',
+                        {url: $url.val()},
+                        function (r) {
+                            if (r.errors) {
+                                alert(r.errors);
+                            } else {
+                                alert('连接成功');
+                                $fieldsContainer.trigger('init', [r.fields]);
+                            }
+                        }
+                    );
+                });
+
+                return $view;
             };
 
         var $optionsContainer = $('div[name="adapter_options-container"]', $container),
@@ -313,7 +334,7 @@
             $fieldsContainer = $container.find('table[name="fields-container"]');
 
         $adapterSelect.change(function () {
-            var $viewType = this.value.toLowerCase() == 'jsonrpc' ? kTmplJsonPpc({}) : initDbEvent();
+            var $viewType = this.value.toLowerCase() == 'jsonrpc' ? initJsonRpc() : initDbEvent();
 
             $optionsContainer.empty().append($viewType);
         }).change();

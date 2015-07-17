@@ -18,14 +18,5 @@ class JsonRpcInputFilter extends InputFilter
                 ],
             ]
         );
-        $this->add(
-            [
-                'type'    => 'Zend\InputFilter\ArrayInput',
-                'name'    => 'fields',
-                'filters' => [
-                    ['name' => 'StringTrim']
-                ],
-            ]
-        );
     }
 }
