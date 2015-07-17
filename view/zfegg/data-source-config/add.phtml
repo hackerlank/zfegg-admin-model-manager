@@ -24,7 +24,6 @@
             <table name="fields-container">
                 <thead>
                 <tr>
-                    <th></th>
                     <th>字段名</th>
                     <th>类型</th>
                     <th>默认值</th>
@@ -44,21 +43,18 @@
 <script type="text/x-kendo-template" id="modelManager-databaseConfig-template-fields">
     # for (var name in fields) { #
     <tr>
-        <td><input type="checkbox" checked value="1"></td>
-        <td>#:name#</td>
-        <td><select>
-                <option value="string" # fields[name].type==
-                'string' ? 'selected' : '' #>String</option>
-                <option value="number" # fields[name].type==
-                'number' ? 'selected' : '' #>Number</option>
-                <option value="date" # fields[name].type==
-                'date' ? 'selected' : '' #>Date</option>
-                <option value="boolean" # fields[name].type==
-                'boolean' ? 'selected' : '' #>boolean</option>
+        <td>#:name#
+            # fields[name].primary ? '<input type="hidden" name="fields['+name+'][primary]" value="1">' : '' #
+        </td>
+        <td><select name="fields[#:name#][type]">
+                <option value="string" # fields[name].type== 'string' ? 'selected' : '' #>String</option>
+                <option value="number" # fields[name].type== 'number' ? 'selected' : '' #>Number</option>
+                <option value="date" # fields[name].type== 'date' ? 'selected' : '' #>Date</option>
+                <option value="boolean" # fields[name].type== 'boolean' ? 'selected' : '' #>boolean</option>
             </select></td>
-        <td><input type="text" value="#:fields[name].defaultValue || ''#"></td>
-        <td><input type="checkbox" #:fields[name].editable ? "checked" : ""# value="1"></td>
-        <td><input type="checkbox" #:fields[name].nullable ? "checked" : ""# value="1"></td>
+        <td><input name="fields[#:name#][defaultValue]" type="text" value="#:fields[name].defaultValue || ''#"></td>
+        <td><input name="fields[#:name#][editable]" type="checkbox" #:fields[name].editable ? "checked" : ""# value="1"></td>
+        <td><input name="fields[#:name#][nullable]" type="checkbox" #:fields[name].nullable ? "checked" : ""# value="1"></td>
     </tr>
     # } #
 </script>
@@ -137,7 +133,7 @@
                 </div>
                 <div class="modelManager-adapter-queryOptions">
                     选择查询字段:<br>
-                    <select name="adapter_options[query_options][column]" multiple size="10">
+                    <select name="adapter_options[query_options][column][]" multiple size="10">
                     </select>
                 </div>
                 <div class="modelManager-adapter-queryOptions" role="where">
@@ -165,7 +161,7 @@
                 </div>
                 <div class="modelManager-adapter-queryOptions">
                     选择默认排序:<br>
-                    <select name="adapter_options[query_options][order]" multiple size="10">
+                    <select name="adapter_options[query_options][order][]" multiple size="10">
                     </select>
                 </div>
                 <div class="clear"></div>
@@ -234,7 +230,7 @@
             },
             initDbSelectMode = function ($elm, tables) {
                 var getSelect = function (name) {
-                        return $('select[name="adapter_options[query_options][' + name + ']"]', $elm);
+                        return $('select[name^="adapter_options[query_options][' + name + ']"]', $elm);
                     },
                     $selectTable = getSelect('table'),
                     $selectColumn = getSelect('column'),

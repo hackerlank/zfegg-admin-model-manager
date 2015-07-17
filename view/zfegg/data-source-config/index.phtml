@@ -77,16 +77,6 @@
             },
             columns: [],
             selectable: true,
-            editable: {
-                mode: "popup",
-                window: {
-                    width: '100%',
-                    open: function () {
-                        this.maximize();
-                    }
-                },
-                template: kendo.template($("#modelManager-databaseConfig-template").html().replace('&#x3A;', ':'))
-            },
             sortable: true,
             change: function () {
                 $toolbar.find('a.k-button').removeAttr('disabled');

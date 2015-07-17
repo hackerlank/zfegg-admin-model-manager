@@ -13,8 +13,8 @@
         if (config.columns) {
             gridSettings.columns = config.columns;
         }
-        if (config.detailEnable) {
-            gridSettings.detailTemplate = config.detailTemplate;
+        if (config.detail_template) {
+            gridSettings.detailTemplate = config.detail_template;
         }
         if (config.toolbar) {
             gridSettings.toolbar= config.toolbar;
@@ -24,10 +24,10 @@
             serviceUrl = '<?=$this->url(null, ['controller' => $id])?>',
             dataSource = new kendo.data.DataSource({
                 transport: {
-                    read: '<?=$this->url(null, ['controller' => $id, 'action' => 'read'])?>',
-                    update: '<?=$this->url(null, ['controller' => $id, 'action' => 'update'])?>',
-                    destroy: '<?=$this->url(null, ['controller' => $id, 'action' => 'delete'])?>',
-                    create: '<?=$this->url(null, ['controller' => $id, 'action' => 'insert'])?>'
+                    read: '<?=$this->url(null, ['id' => $id, 'action' => 'read'])?>',
+                    update: '<?=$this->url(null, ['id' => $id, 'action' => 'update'])?>',
+                    destroy: '<?=$this->url(null, ['id' => $id, 'action' => 'delete'])?>',
+                    create: '<?=$this->url(null, ['id' => $id, 'action' => 'insert'])?>'
                 },
                 schema: {
                     model: {

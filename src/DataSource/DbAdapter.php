@@ -113,6 +113,9 @@ class DbAdapter implements DataSourceInterface
             if (!empty($where)) {
                 $select->where($where);
             }
+            if (!empty($sort)) {
+                $select->order($sort);
+            }
 
             return new Paginator($adapter = new DbSelect($select, $this->getDbAdapter()));
         } else {

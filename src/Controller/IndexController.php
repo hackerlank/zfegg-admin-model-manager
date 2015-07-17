@@ -10,7 +10,7 @@ class IndexController extends AbstractActionController
     public function uiAction()
     {
         $view = new ViewModel();
-        $view->setTemplate(sprintf('model-manager/%s/%s', $this->params('ctrl'), $this->params('name')));
+        $view->setTemplate(sprintf('zfegg/%s/%s', $this->params('ctrl'), $this->params('name')));
         return $view;
     }
 }

@@ -108,6 +108,7 @@ return array(
             'table'   => 'model_manager_data_source_config',
             'primary' => 'id',
             'adapter' => 'Zfegg\Admin\DbAdapter',
+            'invokable' => 'Zfegg\ModelManager\Model\DataSourceConfigTable',
         ),
         'Zfegg\ModelManager\UiConfigTable' => array(
             'table'   => 'model_manager_ui_config',

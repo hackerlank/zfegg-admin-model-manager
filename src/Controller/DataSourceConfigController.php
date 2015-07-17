@@ -4,12 +4,12 @@ namespace Zfegg\ModelManager\Controller;
 
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Metadata\Metadata;
+use Zend\Db\Sql\Select;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\BaseConfigInputFilter;
 use Zfegg\ModelManager\InputFilter\DataSourceConfig\DbAdapterInputFilter;
-use Zfegg\ModelManager\InputFilter\DataSourceConfig\JsonRpcInputFilter;
 
 class DataSourceConfigController extends AbstractActionController
 {
@@ -28,9 +28,9 @@ class DataSourceConfigController extends AbstractActionController
                 'config'   => [
                     'primary'        => 'id',
                     'fields'         => [
-                        'id'              => ['type' => 'number', 'editable' => false, 'nullable' => true],
-                        'name'            => ['type' => 'string'],
-                        'adapter_options' => ['type' => 'string', 'defaultValue' => ['driver_options' => []]],
+                        'id'      => ['type' => 'number', 'editable' => false, 'nullable' => true],
+                        'name'    => ['type' => 'string'],
+                        'adapter' => ['type' => 'string'],
                     ],
                     'columns'        => [
                         [
@@ -49,13 +49,13 @@ class DataSourceConfigController extends AbstractActionController
                         [
                             "field"      => "adapter",
                             "title"      => "适配器",
-                            "values"     => $adapters,
+//                            "values"     => $adapters,
                             "filterable" => true,
                         ],
                     ],
                     'toolbar'        => [
                         ['name' => 'edit', 'text' => '编辑', 'attr' => 'data-action=edit disabled'],
-                        ['name' => 'create', 'text' => '增加', 'attr' => 'data-action=create'],
+//                        ['name' => 'create', 'text' => '增加', 'attr' => 'data-action=create'],
                         ['name' => 'destroy', 'text' => '删除', 'attr' => 'data-action=destroy'],
                     ],
                     'detailEnable'   => true,
@@ -70,13 +70,17 @@ class DataSourceConfigController extends AbstractActionController
         $table = $this->getDataSourceConfigTable();
 
         /** @var \Zend\Paginator\Paginator $paginator */
-        $paginator = $table->fetchPaginator();
+        $paginator = $table->fetchPaginator(function (Select $select) {
+            $select->columns(['id', 'name', 'adapter']);
+        });
         $paginator->setCurrentPageNumber($this->getRequest()->getPost('page', 1));
 
-        return new JsonModel([
-            'total' => $paginator->getTotalItemCount(),
-            'data'  => $paginator->getCurrentItems()->toArray(),
-        ]);
+        return new JsonModel(
+            [
+                'total' => $paginator->getTotalItemCount(),
+                'data'  => (array)$paginator->getCurrentItems(),
+            ]
+        );
     }
 
     public function addAction()
@@ -94,19 +98,11 @@ class DataSourceConfigController extends AbstractActionController
         }
 
         $data = $baseConfigFilters->getValues();
-        var_dump($data);exit;
 
-        $table  = $this->getDataSourceConfigTable();
-        $config = array(
-            'name'    => $data['name'],
-            'adapter' => $data['adapter'],
-        );
+        $table = $this->getDataSourceConfigTable();
+        $table->insert($data);
 
-        unset($data['name'], $data['adapter']);
-        $config['adapter_options'] = json_encode($data);
-        $table->insert($config);
-
-        return new JsonModel(['code' => 1]);
+        return new JsonModel(['code' => 0]);
     }
 
     public function testDbConnectionAction()
@@ -129,10 +125,10 @@ class DataSourceConfigController extends AbstractActionController
             foreach ($metadata->getTables() as $table) {
                 /** @var \Zend\Db\Metadata\Object\ColumnObject[] $columns */
                 $columns = $table->getColumns();
-                foreach ($columns as $column) {
+                foreach ($columns as $key => $column) {
                     if (strpos($column->getDataType(), 'int') !== false) {
                         $type = 'number';
-                    } else if (strpos($column->getDataType(), 'date') !== false ) {
+                    } else if (strpos($column->getDataType(), 'date') !== false) {
                         $type = 'date';
                     } else if (strtolower($column->getDataType()) == 'timestamp') {
                         $type = 'date';
@@ -141,10 +137,14 @@ class DataSourceConfigController extends AbstractActionController
                     }
 
                     $tables[$table->getName()][$column->getName()] = [
-                        'nullable' => $column->getIsNullable(),
+                        'nullable'     => $column->getIsNullable(),
                         'defaultValue' => $column->getColumnDefault() == 'null' ? null : $column->getColumnDefault(),
-                        'type' => $type,
+                        'type'         => $type,
                     ];
+
+                    if ($key == 0 && strpos($column->getName(), 'id') !== false) {
+                        $tables[$table->getName()][$column->getName()]['primary'] = true;
+                    }
                 }
             }
 

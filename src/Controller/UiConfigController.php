@@ -13,23 +13,23 @@ class UiConfigController extends AbstractActionController
     public function initAction()
     {
 
-        /** @var \Zend\Db\TableGateway\TableGateway $table */
-        $table = $this->get('Zfegg\ModelManager\DataSourceConfigTable');
-
+        $table  = $this->getDataSourceConfigTable();
         $result = $table->select(
             function (Select $select) {
-                $select->columns(['name', 'adapter']);
+                $select->columns(['name', 'fields']);
             }
         );
 
-        return new JsonModel([
-            'data_source' => $result->toArray(),
-        ]);
+        return new JsonModel(
+            [
+                'data_source' => $result->toArray(),
+            ]
+        );
     }
 
     public function readAction()
     {
-        $table   = $this->getUiConfigTable();
+        $table = $this->getUiConfigTable();
 
         /** @var \Zend\Paginator\Paginator $paginator */
         $paginator = $table->fetchPaginator(
@@ -39,10 +39,12 @@ class UiConfigController extends AbstractActionController
         );
         $paginator->setCurrentPageNumber($this->getRequest()->getPost('page', 1));
 
-        return new JsonModel([
-            'total' => $paginator->getTotalItemCount(),
-            'data'  => $paginator->getCurrentItems()->toArray(),
-        ]);
+        return new JsonModel(
+            [
+                'total' => $paginator->getTotalItemCount(),
+                'data'  => $paginator->getCurrentItems()->toArray(),
+            ]
+        );
     }
 
     public function getTablesAction()
@@ -66,10 +68,12 @@ class UiConfigController extends AbstractActionController
             $error  = $e->getMessage();
         }
 
-        return new JsonModel([
-            'tables' => $tables,
-            'error'  => $error
-        ]);
+        return new JsonModel(
+            [
+                'tables' => $tables,
+                'error'  => $error
+            ]
+        );
     }
 
     public function saveAction()
@@ -83,16 +87,25 @@ class UiConfigController extends AbstractActionController
 
         $data = $filters->getValues();
 
-        if ($data['source_adapter'] != 'Restful') {
-            $filters2 = new DbUiConfigInputFilter();
-            $filters2->setData($this->getRequest()->getPost('source_config'));
-            if (!$filters2->isValid()) {
-                return new JsonModel(['errors' => $filters2->getMessages()]);
-            }
+        $newColumnsFormat = [];
+        foreach ($data['columns']['field'] as $field) {
+            $newColumnsFormat[$field] = [
+                'field' => $field,
+            ];
 
-            $data += ['source_config' => json_encode($filters2->getValues())];
+            if (!empty($data['columns']['title'][$field])) {
+                $newColumnsFormat[$field]['title'] = $data['columns']['title'][$field];
+            }
+            if (!empty($data['columns']['template'][$field])) {
+                $newColumnsFormat[$field]['template'] = $data['columns']['template'][$field];
+            }
+            if (!empty($data['columns']['width'][$field])) {
+                $newColumnsFormat[$field]['width'] = $data['columns']['width'][$field];
+            }
+            $newColumnsFormat[$field]['filterable'] = !empty($data['columns']['filterable'][$field]);
+            $newColumnsFormat[$field]['sortable']   = !empty($data['columns']['sortable'][$field]);
         }
-        unset($data['source_adapter']);
+        $data['columns'] = $newColumnsFormat;
 
         $table = $this->getUiConfigTable();
         $table->insert($data);
@@ -108,4 +121,11 @@ class UiConfigController extends AbstractActionController
         return $this->get('Zfegg\ModelManager\UiConfigTable');
     }
 
+    /**
+     * @return \Zfegg\ModelManager\Model\DataSourceConfigTable
+     */
+    public function getDataSourceConfigTable()
+    {
+        return $this->get('Zfegg\ModelManager\DataSourceConfigTable');
+    }
 }
