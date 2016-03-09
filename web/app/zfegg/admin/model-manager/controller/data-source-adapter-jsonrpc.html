@@ -1,0 +1,16 @@
+# for (var name in fields) { #
+<tr>
+    <td>#:name#
+        # fields[name].primary ? '<input type="hidden" name="fields['+name+'][primary]" value="1">' : '' #
+    </td>
+    <td><select name="fields[#:name#][type]">
+        <option value="string" # fields[name].type== 'string' ? 'selected' : '' #>String</option>
+        <option value="number" # fields[name].type== 'number' ? 'selected' : '' #>Number</option>
+        <option value="date" # fields[name].type== 'date' ? 'selected' : '' #>Date</option>
+        <option value="boolean" # fields[name].type== 'boolean' ? 'selected' : '' #>Boolean</option>
+    </select></td>
+    <td><input name="fields[#:name#][defaultValue]" type="text" value="#:fields[name].defaultValue || ''#"></td>
+    <td><input name="fields[#:name#][editable]" type="checkbox" #:fields[name].editable ? "checked" : ""# value="1"></td>
+    <td><input name="fields[#:name#][nullable]" type="checkbox" #:fields[name].nullable ? "checked" : ""# value="1"></td>
+</tr>
+# } #
